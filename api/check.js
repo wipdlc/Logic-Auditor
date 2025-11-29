@@ -15,7 +15,7 @@ export default async function handler(req, res) {
         const apiKey = process.env.GEMINI_API_KEY; 
         
         // 使用 Gemini 2.0 Flash 模型 (速度极快，适合即时反馈)
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${AIzaSyADZhoQN-XStOPrckbwfTjX6uLpMC8fRHQ}`;
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
         // ==========================================
         // 🔥 核心 Prompt：逻辑拷打专家
@@ -82,4 +82,5 @@ export default async function handler(req, res) {
             details: error.message 
         });
     }
+
 }
