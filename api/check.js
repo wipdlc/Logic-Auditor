@@ -53,15 +53,21 @@ export default async function handler(req, res) {
         });
 
         const data = await response.json();
-        if (data.code) throw new Error(`Qwen API Error: ${data.message}`);
+        
+        if (data.code) { throw new Error(`Qwen API Error: ${data.message}`); }
 
-        const result = JSON.parse(data.output.choices[0].message.content); // 直接解析原始字符串
+        const aiText = data.output.choices[0].message.content;
+        
+        // 打印出 AI 原始返回的文本，方便调试
+        console.log("Qwen raw response content:", aiText);
+
+        const result = JSON.parse(aiText);
 
         return res.status(200).json(result);
 
     } catch (error) {
-        console.error("Server Error:", error);
+        // 打印详细错误，方便调试
+        console.error("[SERVER ERROR]", error);
         return res.status(500).json({ error: "API 服务出错", details: error.message });
     }
 }
-
