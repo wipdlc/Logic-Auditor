@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Logic Auditor - 逻辑漏洞审计终端</title>
+    <title>Logic Auditor - 逻辑审计终端</title>
     <link rel="stylesheet" href="style.css">
-    <!-- 引入字体图标库（可选，这里用emoji代替） -->
 </head>
 <body>
     <div class="container">
@@ -13,78 +12,91 @@
         <header>
             <div class="brand">
                 <h1>⚖️ Logic Auditor</h1>
-                <span class="tag">杭电二届易班大赛参赛作品</span>
+                <span class="tag">杭电易班创新大赛</span>
             </div>
-            <p class="slogan">拒绝空洞。拒绝逻辑断层。让Logic Auditor为你的文案进行逻辑CT扫描。</p>
         </header>
 
         <main>
-            <!-- 左侧：输入区 -->
-            <section class="input-section">
-                <div class="card-header">
-                    <h2>待审计文本</h2>
-                    <span class="badge" id="sceneBadge">等待输入...</span>
-                </div>
-                <div class="textarea-wrapper">
-                    <textarea id="inputText" placeholder="在此粘贴你的商业计划书、答辩稿或论证段落..."></textarea>
-                    <div class="char-count">建议输入 50 字以上</div>
-                </div>
-                <button id="submitBtn">
-                    <span class="btn-text">开始逻辑审计</span>
-                    <span class="loader"></span>
-                </button>
-            </section>
+            <!-- 上半部分：核心操作与概览 -->
+            <div class="top-wrapper">
+                
+                <!-- 左上：输入区 -->
+                <section class="panel input-panel">
+                    <div class="panel-header">
+                        <h2>📝 待修正文本</h2>
+                    </div>
+                    <textarea id="inputText" placeholder="请输入您的商业计划书、论文论证或答辩稿..."></textarea>
+                    <div class="action-bar">
+                        <span class="char-count">未输入</span>
+                        <button id="submitBtn">
+                            <span class="btn-text">开始逻辑修正</span>
+                            <span class="loader"></span>
+                        </button>
+                    </div>
+                </section>
 
-            <!-- 右侧：结果区 -->
-            <section class="result-section" id="resultSection">
-                <!-- 初始空状态 -->
-                <div class="empty-state">
-                    <div class="icon">🧬</div>
-                    <p>等待审计数据...</p>
-                </div>
-
-                <!-- 结果内容容器 -->
-                <div class="analysis-content" style="display: none;">
-                    <!-- 评分卡 -->
-                    <div class="score-card">
-                        <div class="score-circle">
-                            <span id="scoreValue">--</span>
-                            <small>逻辑分</small>
-                        </div>
-                        <div class="score-info">
-                            <h3>审计完成</h3>
-                            <p id="sceneText">场景识别：--</p>
-                        </div>
+                <!-- 右上：仪表盘 (状态/评分/场景) -->
+                <section class="panel dashboard-panel">
+                    <div class="panel-header">
+                        <h2>📊 修正概览</h2>
+                    </div>
+                    
+                    <!-- 初始/加载状态 -->
+                    <div id="statusState" class="dashboard-content center-mode">
+                        <div class="pulse-icon">🧬</div>
+                        <p id="statusText">Logic Auditor逻辑核心已就绪<br>等待输入文本...</p>
                     </div>
 
-                    <!-- 选项卡切换 -->
+                    <!-- 结果状态 (隐藏) -->
+                    <div id="resultState" class="dashboard-content result-mode" style="display: none;">
+                        <div class="score-container">
+                            <svg viewBox="0 0 36 36" class="circular-chart">
+                                <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                <path class="circle" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                <text x="18" y="20.35" class="percentage">0</text>
+                            </svg>
+                            <span class="label">逻辑评分</span>
+                        </div>
+                        <div class="meta-info">
+                            <div class="meta-item">
+                                <span class="label">识别场景</span>
+                                <strong id="sceneResult">--</strong>
+                            </div>
+                            <div class="meta-item">
+                                <span class="label">发现漏洞</span>
+                                <strong id="issueCount">0 个</strong>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- 下半部分：详情内容 (默认隐藏，分析完显示) -->
+            <div class="bottom-wrapper" id="detailsSection" style="display: none;">
+                <section class="panel details-panel">
+                    <!-- Tab 导航 -->
                     <div class="tabs">
                         <button class="tab-btn active" data-tab="issues">🔍 漏洞定位</button>
-                        <button class="tab-btn" data-tab="revised">📝 逻辑重构稿</button>
+                        <button class="tab-btn" data-tab="revised">✍️ 逻辑重构稿</button>
                     </div>
 
-                    <!-- 1. 漏洞列表 -->
+                    <!-- 1. 漏洞列表内容 -->
                     <div id="tab-issues" class="tab-content active">
                         <ul id="critiquesList"></ul>
                     </div>
 
-                    <!-- 2. 重构文本 -->
+                    <!-- 2. 重构内容 -->
                     <div id="tab-revised" class="tab-content">
-                        <div class="revised-box">
+                        <div class="revised-paper">
                             <div id="revisedText"></div>
-                            <button class="copy-btn" onclick="copyText()">复制全文</button>
+                            <button class="copy-btn" onclick="copyText()">复制全部内容</button>
                         </div>
                     </div>
-                </div>
-            </section>
+                </section>
+            </div>
         </main>
-
-        <footer>
-            <p>Designed for HDU Yiban Tech Innovation Competition | 杭电助手后端支持</p>
-        </footer>
     </div>
 
     <script src="script.js"></script>
 </body>
 </html>
-
