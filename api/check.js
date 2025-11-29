@@ -56,17 +56,13 @@ export default async function handler(req, res) {
         
         if (data.code) { throw new Error(`Qwen API Error: ${data.message}`); }
 
-        const aiText = data.output.choices[0].message.content;
-        
-        // 打印出 AI 原始返回的文本，方便调试
-        console.log("Qwen raw response content:", aiText);
-
-        const result = JSON.parse(aiText);
+        // content 是一个 JSON 字符串，我们需要解析它
+        const jsonString = data.output.choices[0].message.content;
+        const result = JSON.parse(jsonString);
 
         return res.status(200).json(result);
 
     } catch (error) {
-        // 打印详细错误，方便调试
         console.error("[SERVER ERROR]", error);
         return res.status(500).json({ error: "API 服务出错", details: error.message });
     }
