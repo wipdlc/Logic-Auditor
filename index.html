@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HDU 写作逻辑自检机</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>🔬Logic Auditor</h1>
+        <p>粘贴你的文字段落，让Logic Auditor找出逻辑缺陷。</p>
+    </header>
+
+    <main>
+        <!-- 核心输入区 -->
+        <textarea id="inputText" placeholder="粘贴你的论点或论证段落 (如：我认为XX方案能成功，因为...)"></textarea>
+        
+        <!-- 提交按钮 -->
+        <button id="submitBtn">
+            ⚔️ 提交给Logic Auditor拷问 ⚔️
+        </button>
+
+        <!-- 结果展示区 -->
+        <section id="resultArea">
+            <h2>❓ Logic Auditor提出的质疑</h2>
+            <ul id="questionsList">
+                <!-- AI生成的问题会通过JS插入到这里 -->
+            </ul>
+        </section>
+        
+        <!-- 状态/加载提示 -->
+        <p id="statusMessage" style="display:none;">正在分析中，请稍候...</p>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
