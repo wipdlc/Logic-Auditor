@@ -1,37 +1,88 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HDU 写作逻辑自检机</title>
+    <title>Logic Auditor - 逻辑漏洞审计终端</title>
     <link rel="stylesheet" href="style.css">
+    <!-- 引入字体图标库（可选，这里用emoji代替） -->
 </head>
 <body>
-    <header>
-        <h1>🔬Logic Auditor</h1>
-        <p>粘贴你的文字段落，让Logic Auditor找出逻辑缺陷。</p>
-    </header>
+    <div class="container">
+        <!-- 头部 -->
+        <header>
+            <div class="brand">
+                <h1>⚖️ Logic Auditor</h1>
+                <span class="tag">杭电二届易班大赛参赛作品</span>
+            </div>
+            <p class="slogan">拒绝空洞。拒绝逻辑断层。让 AI 为你的文案进行逻辑CT扫描。</p>
+        </header>
 
-    <main>
-        <!-- 核心输入区 -->
-        <textarea id="inputText" placeholder="粘贴你的论点或论证段落 (如：我认为XX方案能成功，因为...)"></textarea>
-        
-        <!-- 提交按钮 -->
-        <button id="submitBtn">
-            ⚔️ 提交给Logic Auditor拷问 ⚔️
-        </button>
+        <main>
+            <!-- 左侧：输入区 -->
+            <section class="input-section">
+                <div class="card-header">
+                    <h2>待审计文本</h2>
+                    <span class="badge" id="sceneBadge">等待输入...</span>
+                </div>
+                <div class="textarea-wrapper">
+                    <textarea id="inputText" placeholder="在此粘贴你的商业计划书、答辩稿或论证段落..."></textarea>
+                    <div class="char-count">建议输入 50 字以上</div>
+                </div>
+                <button id="submitBtn">
+                    <span class="btn-text">开始逻辑审计</span>
+                    <span class="loader"></span>
+                </button>
+            </section>
 
-        <!-- 结果展示区 -->
-        <section id="resultArea">
-            <h2>❓ Logic Auditor提出的质疑</h2>
-            <ul id="questionsList">
-                <!-- AI生成的问题会通过JS插入到这里 -->
-            </ul>
-        </section>
-        
-        <!-- 状态/加载提示 -->
-        <p id="statusMessage" style="display:none;">正在分析中，请稍候...</p>
-    </main>
+            <!-- 右侧：结果区 -->
+            <section class="result-section" id="resultSection">
+                <!-- 初始空状态 -->
+                <div class="empty-state">
+                    <div class="icon">🧬</div>
+                    <p>等待审计数据...</p>
+                </div>
+
+                <!-- 结果内容容器 -->
+                <div class="analysis-content" style="display: none;">
+                    <!-- 评分卡 -->
+                    <div class="score-card">
+                        <div class="score-circle">
+                            <span id="scoreValue">--</span>
+                            <small>逻辑分</small>
+                        </div>
+                        <div class="score-info">
+                            <h3>审计完成</h3>
+                            <p id="sceneText">场景识别：--</p>
+                        </div>
+                    </div>
+
+                    <!-- 选项卡切换 -->
+                    <div class="tabs">
+                        <button class="tab-btn active" data-tab="issues">🔍 漏洞定位</button>
+                        <button class="tab-btn" data-tab="revised">📝 逻辑重构稿</button>
+                    </div>
+
+                    <!-- 1. 漏洞列表 -->
+                    <div id="tab-issues" class="tab-content active">
+                        <ul id="critiquesList"></ul>
+                    </div>
+
+                    <!-- 2. 重构文本 -->
+                    <div id="tab-revised" class="tab-content">
+                        <div class="revised-box">
+                            <div id="revisedText"></div>
+                            <button class="copy-btn" onclick="copyText()">复制全文</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>Designed for HDU Yiban Tech Innovation Competition | 杭电助手后端支持</p>
+        </footer>
+    </div>
 
     <script src="script.js"></script>
 </body>
