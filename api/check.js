@@ -1,4 +1,4 @@
-// 文件路径: api/check.js (最新 Qwen Flash 版本)
+// 文件路径: api/check.js (Qwen Flash)
 export default async function handler(req, res) {
     if (req.method !== 'POST') return res.status(405).json({error: 'Method Not Allowed'});
 
@@ -61,3 +61,4 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: "API 服务出错", details: error.message });
     }
 }
+
