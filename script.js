@@ -1,96 +1,124 @@
-// 文件路径: script.js
+// script.js
 document.addEventListener('DOMContentLoaded', () => {
-    // 获取所有需要的元素
-    const btn = document.getElementById('submitBtn');
-    const input = document.getElementById('inputText');
-    const list = document.getElementById('questionsList');
-    const status = document.getElementById('statusMessage');
-    const sceneResult = document.getElementById('sceneResult'); // 假设 HTML 里有这个元素
+    const elements = {
+        input: document.getElementById('inputText'),
+        btn: document.getElementById('submitBtn'),
+        btnText: document.querySelector('#submitBtn .btn-text'),
+        loader: document.querySelector('#submitBtn .loader'),
+        emptyState: document.querySelector('.empty-state'),
+        analysisContent: document.querySelector('.analysis-content'),
+        
+        // 结果相关
+        scoreValue: document.getElementById('scoreValue'),
+        sceneText: document.getElementById('sceneText'),
+        sceneBadge: document.getElementById('sceneBadge'),
+        critiquesList: document.getElementById('critiquesList'),
+        revisedText: document.getElementById('revisedText'),
+        
+        // Tabs
+        tabs: document.querySelectorAll('.tab-btn'),
+        tabContents: document.querySelectorAll('.tab-content')
+    };
 
-    // 主函数：处理点击事件
-    btn.addEventListener('click', async () => {
-        const text = input.value.trim();
-        if (text.length < 10) {
-            alert("请至少输入一句话（10个字以上）");
+    // 绑定提交事件
+    elements.btn.addEventListener('click', handleSubmit);
+
+    // 绑定 Tab 切换事件
+    elements.tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            // 移除所有 active
+            elements.tabs.forEach(t => t.classList.remove('active'));
+            elements.tabContents.forEach(c => c.classList.remove('active'));
+            
+            // 激活当前
+            tab.classList.add('active');
+            const targetId = `tab-${tab.dataset.tab}`;
+            document.getElementById(targetId).classList.add('active');
+        });
+    });
+
+    async function handleSubmit() {
+        const text = elements.input.value.trim();
+        if (text.length < 5) {
+            alert('输入内容太少，Logic Auditor 无法分析。');
             return;
         }
 
-        // --- 1. 进入加载状态 ---
-        setLoadingState(true);
+        toggleLoading(true);
 
         try {
-            // --- 2. 发送请求 ---
-            const response = await fetch('/api/check', {
+            const res = await fetch('/api/check', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ text })
             });
 
-            const data = await response.json();
+            const data = await res.json();
 
-            // --- 3. 处理错误 ---
-            if (!response.ok || data.error) {
-                // 如果后端返回了明确的错误信息
-                throw new Error(data.details || data.error || '未知的服务器错误');
-            }
+            if (!res.ok) throw new Error(data.error || 'Request failed');
             
-            // --- 4. 渲染成功结果 ---
-            renderSuccess(data);
-
+            renderResult(data);
         } catch (error) {
-            // --- 5. 渲染失败结果 ---
-            console.error("Fetch Error:", error);
-            renderError(error.message);
-
+            console.error(error);
+            alert(`分析失败: ${error.message}`);
         } finally {
-            // --- 6. 无论成功失败，都退出加载状态 ---
-            setLoadingState(false);
+            toggleLoading(false);
         }
-    });
+    }
 
-    // --- 辅助函数：设置加载状态 ---
-    function setLoadingState(isLoading) {
+    function toggleLoading(isLoading) {
+        elements.btn.disabled = isLoading;
         if (isLoading) {
-            btn.disabled = true;
-            btn.innerText = "⚡ AI 正在深度分析中...";
-            status.style.display = 'block';
-            status.textContent = "正在连接云端大脑...";
-            status.style.color = "#666"; // 重置颜色
-            list.innerHTML = '';
-            if(sceneResult) sceneResult.style.display = 'none';
+            elements.btnText.textContent = "Logic Auditor正在极速审计中...";
+            elements.loader.style.display = 'block';
+            elements.analysisContent.style.display = 'none';
         } else {
-            btn.disabled = false;
-            btn.innerText = "⚔️ 提交给 AI 教授拷问 ⚔️";
-            status.style.display = 'none';
+            elements.btnText.textContent = "开始逻辑审计";
+            elements.loader.style.display = 'none';
         }
     }
 
-    // --- 辅助函数：渲染成功 ---
-    function renderSuccess(data) {
-        if (data.detected_scene && sceneResult) {
-            sceneResult.innerHTML = `AI 已识别场景：<strong>${data.detected_scene}</strong>`;
-            sceneResult.style.display = 'block';
-        }
+    function renderResult(data) {
+        elements.emptyState.style.display = 'none';
+        elements.analysisContent.style.display = 'block';
+
+        // 1. 基础信息
+        elements.sceneBadge.textContent = data.scene || "未知场景";
+        elements.sceneText.textContent = `场景识别：${data.scene}`;
         
+        // 2. 评分动画与颜色
+        const score = data.score || 0;
+        elements.scoreValue.textContent = score;
+        const scoreColor = score < 60 ? '#ff4d4f' : (score < 80 ? '#faad14' : '#52c41a');
+        document.querySelector('.score-circle').style.backgroundColor = scoreColor;
+
+        // 3. 渲染漏洞列表
+        elements.critiquesList.innerHTML = '';
         data.critiques.forEach(item => {
-            const card = document.createElement('li');
-            card.className = 'critique-card';
-            card.innerHTML = `
-                <div class="question">❓ ${item.question}</div>
-                <div class="suggestion"><p>💡 <strong>建议：</strong>${item.suggestion}</p></div>
+            const li = document.createElement('li');
+            li.className = 'critique-item';
+            li.innerHTML = `
+                <div class="q-issue">🚫 逻辑漏洞：${item.issue}</div>
+                <div class="q-quote">“${item.quote}”</div>
+                <div class="q-fix">💡 <b>修改建议：</b>${item.fix}</div>
             `;
-            list.appendChild(card);
-
-            card.addEventListener('click', () => {
-                card.classList.toggle('expanded');
-            });
+            li.addEventListener('click', () => li.classList.toggle('expanded'));
+            elements.critiquesList.appendChild(li);
         });
-    }
 
-    // --- 辅助函数：渲染错误 ---
-    function renderError(message) {
-        status.textContent = `❌ 分析失败: ${message}`;
-        status.style.color = "red";
-        status.style.display = 'block';
+        // 4. 渲染重构文本
+        // 后端返回的是带 <b> 标签的字符串，innerHTML 可以直接渲染高亮
+        elements.revisedText.innerHTML = data.revised_text.replace(/\n/g, '<br>');
+
+        // 自动切到第一个Tab
+        elements.tabs[0].click();
     }
 });
+
+// 全局函数：复制文本
+window.copyText = function() {
+    const text = document.getElementById('revisedText').innerText;
+    navigator.clipboard.writeText(text).then(() => {
+        alert('重构内容已复制到剪贴板！');
+    });
+};
