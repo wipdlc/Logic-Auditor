@@ -55,8 +55,7 @@ export default async function handler(req, res) {
         const data = await response.json();
         if (data.code) throw new Error(`Qwen API Error: ${data.message}`);
 
-        const aiText = data.output.choices[0].message.content;
-        const result = JSON.parse(aiText);
+        const result = JSON.parse(data.output.choices[0].message.content); // 直接解析原始字符串
 
         return res.status(200).json(result);
 
@@ -65,3 +64,4 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: "API 服务出错", details: error.message });
     }
 }
+
