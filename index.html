@@ -3,16 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Logic Auditor - 逻辑审计终端</title>
+    <title>Logic Auditor - 逻辑修正终端</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <!-- 头部 -->
+        <!-- 头部：左右布局 -->
         <header>
-            <div class="brand">
-                <h1>⚖️ Logic Auditor</h1>
-                <span class="tag">杭电易班创新大赛</span>
+            <!-- 左侧：产品品牌 -->
+            <div class="brand-wrapper">
+                <div class="brand">
+                    <h1>⚖️ Logic Auditor</h1>
+                    <span class="tag">杭电二届易班大赛</span>
+                </div>
+            </div>
+
+            <!-- 右侧：学校标识 -->
+            <div class="header-right">
+                <span class="uni-name">杭州电子科技大学</span>
+                <!-- 这里使用了杭电Logo的网络地址，建议下载后换成本地路径 -->
+                <img src="https://upload.wikimedia.org/wikipedia/zh/c/cf/Hangzhou_Dianzi_University_Logo.svg.png" alt="HDU Logo" class="uni-logo">
             </div>
         </header>
 
@@ -27,7 +37,7 @@
                     </div>
                     <textarea id="inputText" placeholder="请输入您的商业计划书、论文论证或答辩稿..."></textarea>
                     <div class="action-bar">
-                        <span class="char-count">未输入</span>
+                        <span class="char-count">Logic Auditor Ready</span>
                         <button id="submitBtn">
                             <span class="btn-text">开始逻辑修正</span>
                             <span class="loader"></span>
