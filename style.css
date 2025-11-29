@@ -1,154 +1,260 @@
-/* 文件路径: style.css */
+/* style.css */
 :root {
-    --primary: #0056b3;
-    --bg: #f4f6f9;
-    --card-bg: #ffffff;
-    --text-color: #333;
-    --border-radius: 12px;
+    --primary: #1890ff; /* 科技蓝 */
+    --primary-dark: #096dd9;
+    --accent: #faad14; /* 警告黄 */
+    --bg: #f0f2f5;
+    --card: #ffffff;
+    --text-main: #262626;
+    --text-sub: #8c8c8c;
+    --border: #e8e8e8;
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background: var(--bg);
+    margin: 0;
+    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background-color: var(--bg);
+    color: var(--text-main);
     display: flex;
     justify-content: center;
-    padding: 20px;
-    color: var(--text-color);
+    min-height: 100vh;
 }
 
-main {
-    background: var(--card-bg);
+.container {
     width: 100%;
-    max-width: 800px;
-    padding: 30px 40px;
-    border-radius: var(--border-radius);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    max-width: 1200px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
 }
 
 header {
     text-align: center;
-    margin-bottom: 25px;
+    margin-bottom: 30px;
 }
 
-h1 {
-    color: var(--primary);
+.brand h1 {
     font-size: 2rem;
-    margin-bottom: 8px;
+    margin: 0;
+    color: #001529;
+    display: inline-block;
+    vertical-align: middle;
 }
 
-header p {
-    color: #666;
-    margin-bottom: 25px;
+.tag {
+    background: #e6f7ff;
+    color: var(--primary);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    border: 1px solid #91d5ff;
+    margin-left: 10px;
+    vertical-align: middle;
+}
+
+.slogan {
+    color: var(--text-sub);
+    margin-top: 10px;
+}
+
+main {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    flex: 1;
+}
+
+/* 响应式：手机端变单栏 */
+@media (max-width: 768px) {
+    main { grid-template-columns: 1fr; }
+}
+
+/* 卡片通用样式 */
+section {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+}
+
+h2 { font-size: 1.2rem; margin: 0 0 15px 0; }
+
+.textarea-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
 }
 
 textarea {
     width: 100%;
-    height: 180px;
+    height: 100%;
+    min-height: 300px;
     padding: 15px;
-    border: 2px solid #e0e0e0;
+    border: 1px solid var(--border);
     border-radius: 8px;
     font-size: 1rem;
+    line-height: 1.6;
+    resize: none;
     box-sizing: border-box;
-    resize: vertical;
-    margin-bottom: 15px;
-    transition: border-color 0.3s;
-}
-
-textarea:focus {
     outline: none;
-    border-color: var(--primary);
-}
-
-button {
-    width: 100%;
-    padding: 15px;
-    background: var(--primary);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 1.1rem;
-    font-weight: bold;
-    cursor: pointer;
     transition: all 0.3s;
 }
 
-button:hover {
-    background: #004494;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(0, 86, 179, 0.2);
-}
+textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(24,144,255,0.2); }
 
-button:disabled {
-    background: #ccc;
-    cursor: wait;
-    transform: none;
-    box-shadow: none;
-}
+.char-count { text-align: right; color: #ccc; font-size: 0.8rem; margin-top: 5px; }
 
-/* 结果区域 */
-#resultArea {
-    margin-top: 30px;
-}
-
-#sceneResult {
-    text-align: center;
-    margin-bottom: 20px;
+#submitBtn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 8px;
     font-size: 1.1rem;
-    color: #555;
-    background: #eef2f7;
-    padding: 10px;
-    border-radius: 8px;
-    display: none; /* 默认隐藏 */
-}
-
-#sceneResult strong {
-    color: var(--primary);
-}
-
-/* 问题卡片 */
-.critique-card {
-    background: #fff;
-    border: 1px solid #e5e5e5;
-    border-radius: 8px;
-    margin-bottom: 15px;
     cursor: pointer;
-    overflow: hidden;
-    transition: box-shadow 0.3s;
-}
-
-.critique-card:hover {
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
-}
-
-.question {
-    padding: 18px;
-    font-weight: bold;
+    transition: all 0.3s;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
 }
 
-.question::after {
-    content: '▼'; /* 箭头 */
-    font-size: 0.8em;
-    transition: transform 0.3s;
+#submitBtn:hover { background: var(--primary-dark); }
+#submitBtn:disabled { background: #ccc; cursor: not-allowed; }
+
+/* 结果区域样式 */
+.empty-state {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #ccc;
+}
+.empty-state .icon { font-size: 3rem; margin-bottom: 10px; }
+
+/* 评分卡 */
+.score-card {
+    display: flex;
+    align-items: center;
+    background: #f9f9f9;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
 }
 
-.suggestion {
-    padding: 0 18px;
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.4s ease-out, padding 0.4s ease-out;
-    color: #1a73e8;
-    line-height: 1.6;
-    border-top: 1px solid #eee;
+.score-circle {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-right: 15px;
+}
+#scoreValue { font-size: 1.5rem; font-weight: bold; line-height: 1; }
+.score-circle small { font-size: 0.6rem; opacity: 0.8; }
+
+.score-info h3 { margin: 0; font-size: 1rem; }
+.score-info p { margin: 5px 0 0 0; font-size: 0.9rem; color: var(--text-sub); }
+
+/* Tab 切换 */
+.tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 20px;
 }
 
-/* 展开后的样式 */
-.critique-card.expanded .question::after {
-    transform: rotate(180deg);
+.tab-btn {
+    flex: 1;
+    padding: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    color: var(--text-sub);
+    border-bottom: 2px solid transparent;
 }
-.critique-card.expanded .suggestion {
-    max-height: 500px; /* 一个足够大的值 */
-    padding: 18px;
+
+.tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+
+.tab-content { display: none; }
+.tab-content.active { display: block; animation: fadeIn 0.3s; }
+
+/* 漏洞列表 */
+#critiquesList { padding: 0; margin: 0; list-style: none; }
+
+.critique-item {
+    background: #fff;
+    border: 1px solid #ffccc7; /* 浅红边框表示警告 */
+    border-left: 4px solid #ff4d4f;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    padding: 15px;
+    cursor: pointer;
+    transition: transform 0.2s;
 }
+
+.critique-item:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.05); }
+
+.q-quote { 
+    font-style: italic; 
+    color: var(--text-sub); 
+    margin-bottom: 8px; 
+    font-size: 0.9rem; 
+    padding-left: 10px;
+    border-left: 2px solid #ddd;
+}
+
+.q-issue { font-weight: bold; color: #cf1322; margin-bottom: 5px; }
+.q-fix { color: var(--text-main); font-size: 0.95rem; display: none; margin-top: 10px; padding-top: 10px; border-top: 1px dashed #eee;}
+
+.critique-item.expanded .q-fix { display: block; }
+.critique-item::after { content: '点击查看建议 👇'; font-size: 0.8rem; color: #999; display: block; margin-top: 5px; text-align: right;}
+.critique-item.expanded::after { content: ''; }
+
+/* 重构文本 */
+.revised-box {
+    background: #f6ffed;
+    border: 1px solid #b7eb8f;
+    padding: 20px;
+    border-radius: 8px;
+    line-height: 1.8;
+}
+
+#revisedText b {
+    background-color: #ffe58f; /* 高亮修改部分 */
+    padding: 0 2px;
+    color: #d46b08;
+}
+
+.copy-btn {
+    margin-top: 15px;
+    padding: 5px 15px;
+    background: #fff;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+/* Loader Animation */
+.loader {
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #fff;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    animation: spin 1s linear infinite;
+    display: none;
+    margin-left: 10px;
+}
+
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
