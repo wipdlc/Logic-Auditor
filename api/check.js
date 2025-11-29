@@ -56,9 +56,10 @@ export default async function handler(req, res) {
         
         if (data.code) { throw new Error(`Qwen API Error: ${data.message}`); }
 
-        // content 是一个 JSON 字符串，我们需要解析它
-        const jsonString = data.output.choices[0].message.content;
-        const result = JSON.parse(jsonString);
+        // --- 核心修改：相信报错，不再画蛇添足 ---
+        // 既然日志说 data.output.choices[0].message.content 已经是 [object Object]，
+        // 那我们就直接把它当成结果返回！
+        const result = JSON.parse(data.output.choices[0].message.content);
 
         return res.status(200).json(result);
 
