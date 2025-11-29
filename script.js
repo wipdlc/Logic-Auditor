@@ -1,58 +1,67 @@
-// 文件路径: script.js
+// 文件路径: script.js (最终交互版)
 document.addEventListener('DOMContentLoaded', () => {
-    const submitBtn = document.getElementById('submitBtn');
-    const inputText = document.getElementById('inputText');
-    const questionsList = document.getElementById('questionsList');
-    const statusMessage = document.getElementById('statusMessage');
+    const btn = document.getElementById('submitBtn');
+    const input = document.getElementById('inputText');
+    const list = document.getElementById('questionsList');
+    const status = document.getElementById('statusMessage');
+    const sceneResult = document.getElementById('sceneResult');
 
-    submitBtn.addEventListener('click', async () => {
-        const text = inputText.value.trim();
-        if (text.length < 10) return alert("请至少输入一句话（10个字以上）");
+    btn.addEventListener('click', async () => {
+        const text = input.value.trim();
+        if (text.length < 10) return alert("请至少输入一句话！");
 
-        // 1. 状态锁定
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = "⚡Logic Auditor正在进行逻辑研究..."; // 更有科技感的文案
-        statusMessage.style.display = 'block';
-        statusMessage.textContent = "正在连接阿里云算力中心...";
-        questionsList.innerHTML = '';
+        // 1. 锁定界面
+        btn.disabled = true;
+        btn.innerText = "⚡ Logic Auditor正在深度分析中...";
+        status.style.display = 'block';
+        sceneResult.style.display = 'none';
+        list.innerHTML = '';
 
         try {
             // 2. 请求后端
-            const response = await fetch('/api/check', {
+            const res = await fetch('/api/check', {
                 method: 'POST',
-                body: JSON.stringify({ text: text })
+                body: JSON.stringify({ text })
             });
+            const data = await res.json();
+            if (data.error) throw new Error(data.details || '服务出错');
 
-            const data = await response.json();
-
-            if (!response.ok) throw new Error(data.details || '请求失败');
-
-            // 3. 结果展示
-            statusMessage.style.display = 'none';
+            // 3. 渲染场景和问题卡片
+            status.style.display = 'none';
             
-            data.questions.forEach((q, index) => {
-                const li = document.createElement('li');
-                li.textContent = q;
-                li.style.opacity = 0;
-                li.style.transform = "translateX(-20px)"; // 从左侧飞入
-                questionsList.appendChild(li);
+            // 显示识别出的场景
+            sceneResult.innerHTML = `AI 已识别场景：<strong>${data.detected_scene}</strong>`;
+            sceneResult.style.display = 'block';
 
-                // 逐条显示的动画
-                setTimeout(() => {
-                    li.style.transition = "all 0.5s ease";
-                    li.style.opacity = 1;
-                    li.style.transform = "translateX(0)";
-                }, index * 200);
+            data.critiques.forEach(item => {
+                // 创建卡片结构
+                const card = document.createElement('li');
+                card.className = 'critique-card';
+                
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'question';
+                questionDiv.textContent = `❓ ${item.question}`;
+                
+                const suggestionDiv = document.createElement('div');
+                suggestionDiv.className = 'suggestion';
+                suggestionDiv.innerHTML = `<p>💡 <strong>建议：</strong>${item.suggestion}</p>`;
+
+                card.appendChild(questionDiv);
+                card.appendChild(suggestionDiv);
+                list.appendChild(card);
+
+                // 4. 为每个卡片添加点击事件
+                card.addEventListener('click', () => {
+                    card.classList.toggle('expanded');
+                });
             });
 
-        } catch (error) {
-            console.error(error);
-            statusMessage.textContent = "❌ 分析失败: " + error.message;
-            statusMessage.style.color = "red";
+        } catch (e) {
+            status.textContent = "❌ 错误: " + e.message;
+            status.style.color = "red";
         } finally {
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = "⚔️ 提交给Logic Auditor教授拷问 ⚔️";
+            btn.disabled = false;
+            btn.innerText = "⚔️ 提交给Logic Auditor ⚔️";
         }
     });
-
 });
