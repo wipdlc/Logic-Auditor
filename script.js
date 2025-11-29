@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
         submitBtn.disabled = true;
         submitBtn.innerHTML = "⚡Logic Auditor正在进行逻辑研究..."; // 更有科技感的文案
         statusMessage.style.display = 'block';
-        statusMessage.textContent = "正在连接 Google 算力中心...";
+        statusMessage.textContent = "正在连接阿里云算力中心...";
         questionsList.innerHTML = '';
 
         try {
@@ -54,4 +54,5 @@ document.addEventListener('DOMContentLoaded', () => {
             submitBtn.innerHTML = "⚔️ 提交给Logic Auditor教授拷问 ⚔️";
         }
     });
+
 });
