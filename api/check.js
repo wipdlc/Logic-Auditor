@@ -6,15 +6,44 @@ import { KNOWLEDGE_BASE, detectScenario } from './knowledge_base.js';
 };
 
 export default async function handler(req, res) {
+    // 1. 允许 CORS 跨域 (解决很多网络中断的玄学问题)
+    res.setHeader('Access-Control-Allow-Credentials', true);
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+    res.setHeader(
+        'Access-Control-Allow-Headers',
+        'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
+    );
+
+    if (req.method === 'OPTIONS') {
+        res.status(200).end();
+        return;
+    }
+
     if (req.method !== 'POST') return res.status(405).json({ error: 'Method Not Allowed' });
 
     try {
-        const { text, chunkIndex = 0, totalChunks = 1 } = req.body;
-        
-        // 1. 基础校验
-        if (!text || text.length < 5) {
-            return res.status(200).json({ score: 0, critiques: [], revised_text: "" });
+        // 鲁棒的 Body 解析
+        // Vercel 有时会传入已经解析的对象，有时是字符串，必须双重判断
+        let bodyData = req.body;
+        if (typeof bodyData === 'string') {
+            try {
+                bodyData = JSON.parse(bodyData);
+            } catch (e) {
+                console.error("Body JSON parse error", e);
+                return res.status(400).json({ error: "Invalid JSON body" });
+            }
         }
+        
+        // 安全获取参数，防止解构 undefined 报错
+        const { text, chunkIndex = 0, totalChunks = 1 } = bodyData || {};
+
+        if (!text || typeof text !== 'string' || text.length < 1) {
+             // 如果没读到文本，不做无谓的计算，直接返回空结果（防止前端报错）
+             console.warn("Empty text received");
+             return res.status(200).json({ score: 0, critiques: [], revised_text: "" });
+        }
+
 
         const apiKey = process.env.QWEN_API_KEY;
         const url = 'https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation';
@@ -24,7 +53,7 @@ export default async function handler(req, res) {
         const scenarioName = scenarioKey === 'academic' ? '学术论文/答辩' : (scenarioKey === 'business' ? '商业计划书/创赛' : '通用逻辑陈述');
         const rules = KNOWLEDGE_BASE[scenarioKey];
 
-        // 3. 构建高强度的逻辑审计 Prompt (集大成者)
+        // 3. 构建高强度的逻辑审计 Prompt 
         const systemPrompt = `你是一个名为 "Logic Auditor" 的严苛逻辑审计与重构系统。
 你的身份是【红队测试专家】与【顶级期刊编辑】的结合体。
 你的目标不仅仅是润色，而是**摧毁**这段文本中模糊、空洞、逻辑断裂的部分，并基于权威标准进行重建。
@@ -41,6 +70,7 @@ ${rules}
    - 请找出本片段中 **2-5个** 最严重的逻辑谬误。
    - 关注点：循环论证、滑坡谬误、以偏概全、数据缺失、因果倒置、定义模糊。
    - **必须提取原文**：critiques中的 "quote" 字段必须精确复制原文中的问题句子。
+    - 如果本片段的逻辑谬误不严重，那就寻找0-2个逻辑谬误。
 
 2. **强制规则引用 (Rule Grounding)**：
    - 当你指控一个漏洞时，**必须**引用上述【核心校验标准】中的具体条款（包含标准名和序号）。
@@ -179,3 +209,4 @@ function extractByRegex(brokenJson, originalText) {
         revised_text: revisedText + "..." // 加上省略号示意截断
     };
 }
+
