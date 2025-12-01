@@ -5,39 +5,45 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Logic Auditor - 逻辑修正终端</title>
     <link rel="stylesheet" href="style.css">
+    
+    <!-- 引入 PDF.js 用于前端解析 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    </script>
 </head>
 <body>
     <div class="container">
-        <!-- 头部：左右布局 -->
         <header>
-            <!-- 左侧：产品品牌 -->
             <div class="brand-wrapper">
                 <div class="brand">
                     <h1>⚖️ Logic Auditor</h1>
-                    <span class="tag">杭电二届易班大赛</span>
+                    <span class="tag">AI Logic Defense Agent</span>
                 </div>
             </div>
-
-            <!-- 右侧：学校标识 -->
             <div class="header-right">
-                <span class="uni-name">杭州电子科技大学</span>
-                <!-- 插入杭电Logo -->
+                <span class="uni-name">杭州电子科技大学 | 易班决赛作品</span>
                 <img src="./assets/hdu-logo.png" alt="HDU Logo" class="uni-logo">
             </div>
         </header>
 
         <main>
-            <!-- 上半部分：核心操作与概览 -->
             <div class="top-wrapper">
-                
-                <!-- 左上：输入区 -->
+                <!-- 左侧：输入与上传 -->
                 <section class="panel input-panel">
                     <div class="panel-header">
-                        <h2>📝 待修正文本</h2>
+                        <h2>📝 修正对象</h2>
+                        <!-- 新增：上传按钮 -->
+                        <div class="file-upload-wrapper">
+                            <input type="file" id="pdfUpload" accept="application/pdf" style="display: none;" />
+                            <button class="upload-btn" onclick="document.getElementById('pdfUpload').click()">
+                                📂 导入 PDF / 论文 / BP
+                            </button>
+                        </div>
                     </div>
-                    <textarea id="inputText" placeholder="请输入您的商业计划书、论文论证或答辩稿..."></textarea>
+                    <textarea id="inputText" placeholder="请粘贴文本，或点击右上方按钮上传 PDF 文件。&#10;Logic Auditor 将自动进行场景识别与逻辑对抗测试..."></textarea>
                     <div class="action-bar">
-                        <span class="char-count">Logic Auditor Ready</span>
+                        <span class="char-count">Waiting for input...</span>
                         <button id="submitBtn">
                             <span class="btn-text">开始逻辑修正</span>
                             <span class="loader"></span>
@@ -45,19 +51,18 @@
                     </div>
                 </section>
 
-                <!-- 右上：仪表盘 (状态/评分/场景) -->
+                <!-- 右侧：智能仪表盘 -->
                 <section class="panel dashboard-panel">
                     <div class="panel-header">
                         <h2>📊 修正概览</h2>
                     </div>
                     
-                    <!-- 初始/加载状态 -->
                     <div id="statusState" class="dashboard-content center-mode">
                         <div class="pulse-icon">🧬</div>
-                        <p id="statusText">Logic Auditor逻辑核心已就绪<br>等待输入文本...</p>
+                        <!-- 这里会动态显示 RAG 的调用过程 -->
+                        <p id="statusText">Agent系统就绪<br>请导入待修正内容</p>
                     </div>
 
-                    <!-- 结果状态 (隐藏) -->
                     <div id="resultState" class="dashboard-content result-mode" style="display: none;">
                         <div class="score-container">
                             <svg viewBox="0 0 36 36" class="circular-chart">
@@ -65,7 +70,7 @@
                                 <path class="circle" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                                 <text x="18" y="20.35" class="percentage">0</text>
                             </svg>
-                            <span class="label">逻辑评分</span>
+                            <span class="label">逻辑健壮性</span>
                         </div>
                         <div class="meta-info">
                             <div class="meta-item">
@@ -74,40 +79,37 @@
                             </div>
                             <div class="meta-item">
                                 <span class="label">发现漏洞</span>
-                                <strong id="issueCount">0 个</strong>
+                                <strong id="issueCount">0</strong>
                             </div>
+                        </div>
+                        <!-- 新增：思维链展示区 -->
+                        <div class="thought-trace">
+                            <span class="trace-label">🧠 Logic Chain:</span>
+                            <span id="thoughtTrace">分析完成</span>
                         </div>
                     </div>
                 </section>
             </div>
 
-            <!-- 下半部分：详情内容 (默认隐藏，分析完显示) -->
             <div class="bottom-wrapper" id="detailsSection" style="display: none;">
                 <section class="panel details-panel">
-                    <!-- Tab 导航 -->
                     <div class="tabs">
-                        <button class="tab-btn active" data-tab="issues">🔍 漏洞定位</button>
+                        <button class="tab-btn active" data-tab="issues">🔍 漏洞定位 & 规则引用</button>
                         <button class="tab-btn" data-tab="revised">✍️ 逻辑重构稿</button>
                     </div>
-
-                    <!-- 1. 漏洞列表内容 -->
                     <div id="tab-issues" class="tab-content active">
                         <ul id="critiquesList"></ul>
                     </div>
-
-                    <!-- 2. 重构内容 -->
                     <div id="tab-revised" class="tab-content">
                         <div class="revised-paper">
                             <div id="revisedText"></div>
-                            <button class="copy-btn" onclick="copyText()">复制全部内容</button>
+                            <button class="copy-btn" onclick="copyText()">复制全文</button>
                         </div>
                     </div>
                 </section>
             </div>
         </main>
     </div>
-
     <script src="script.js"></script>
 </body>
 </html>
-
