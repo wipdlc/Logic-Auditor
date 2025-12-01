@@ -1,345 +1,330 @@
 [
   {
-    "id": "BP_01_MARKET_EVIDENCE",
+    "id": "BP_01",
     "category": "business",
-    "tags": ["市场", "规模", "前景", "份额", "增长", "TAM", "SAM"],
-    "content": "【依据：互联网+大赛评审规则-商业性】严禁“拍脑袋”虚构市场数据。市场容量（TAM/SAM/SOM）分析必须引用权威第三方数据（如IDC、Gartner、艾瑞咨询、国家统计局），并标注明确年份。无数据支撑的“市场广阔”将被判定为逻辑空洞。",
+    "display_source": "《中国国际“互联网+”大学生创新创业大赛评审规则》- 商业性维度",
+    "tags": ["市场", "规模", "前景", "TAM", "SAM", "SOM", "份额"],
+    "content": "行业调查必须深入详实。严禁“拍脑袋”虚构市场数据。市场容量（TAM/SAM/SOM）分析必须引用权威第三方数据（如IDC、Gartner、艾瑞咨询、国家统计局），并标注明确年份。无数据支撑的“市场广阔”描述视为无效。",
     "weight": 10
   },
   {
-    "id": "BP_02_PAIN_POINT",
+    "id": "BP_02",
     "category": "business",
-    "tags": ["痛点", "需求", "问题", "现状", "背景"],
-    "content": "【依据：互联网+大赛评审规则-创新性】痛点必须是“真痛点”而非“伪需求”。必须通过田野调查、用户访谈数据或实际场景照片来证明痛点的存在，禁止仅通过网络搜索拼凑痛点描述。",
+    "display_source": "《中国国际“互联网+”大学生创新创业大赛评审规则》- 创新性维度",
+    "tags": ["痛点", "需求", "伪需求", "现状", "背景"],
+    "content": "痛点必须是“真痛点”而非“伪需求”。必须通过田野调查、用户访谈数据、问卷样本（N>100）或实际场景照片来证明痛点的存在，禁止仅通过网络搜索拼凑痛点描述。",
     "weight": 9
   },
   {
-    "id": "BP_03_BIZ_MODEL",
+    "id": "BP_03",
     "category": "business",
-    "tags": ["商业模式", "盈利", "赚钱", "收入", "变现", "利润"],
-    "content": "【依据：互联网+大赛评审规则-商业性】必须清晰阐述盈利模式（如何赚钱）。核心逻辑链条“获客->转化->留存->变现”缺一不可。禁止只谈情怀或技术，不谈具体的收费节点和定价策略。",
+    "display_source": "《商业计划书通用撰写规范》- 商业模式",
+    "tags": ["商业模式", "盈利", "赚钱", "收入", "变现", "利润", "闭环"],
+    "content": "必须清晰阐述盈利模式（如何赚钱）。核心逻辑链条“获客->转化->留存->变现”缺一不可。禁止只谈情怀或技术，不谈具体的收费节点（Pricing Strategy）和客单价。",
     "weight": 10
   },
   {
-    "id": "BP_04_FINANCE_PREDICT",
+    "id": "BP_04",
     "category": "business",
-    "tags": ["财务", "预测", "营收", "成本", "盈亏", "报表"],
-    "content": "【依据：互联网+大赛评审规则-商业性】必须提供未来3-5年的财务预测。包括营收增长率、成本结构变化及盈亏平衡点（Break-even Point）。数据推导过程必须符合行业常识，严禁出现线性暴涨的虚假数据。",
+    "display_source": "《中国国际“互联网+”大学生创新创业大赛评审规则》- 商业性维度",
+    "tags": ["财务", "预测", "营收", "成本", "盈亏", "报表", "增长率"],
+    "content": "必须提供未来3-5年的财务预测。包括营收增长率、成本结构变化及盈亏平衡点（Break-even Point）。数据推导过程必须符合行业常识，严禁出现无逻辑的线性暴涨（Hockey Stick Growth）。",
     "weight": 8
   },
   {
-    "id": "BP_05_TEAM_COMP",
+    "id": "BP_05",
     "category": "business",
-    "tags": ["团队", "成员", "CEO", "CTO", "CFO", "分工"],
-    "content": "【依据：互联网+大赛评审规则-团队情况】团队结构必须互补（技术+管理+市场）。CEO必须全职或有足够精力投入，严禁挂名。必须展示核心成员的教育背景和与项目相关的过往业绩。",
+    "display_source": "《中国国际“互联网+”大学生创新创业大赛评审规则》- 团队情况",
+    "tags": ["团队", "成员", "CEO", "CTO", "分工", "互补"],
+    "content": "团队结构必须互补（技术+管理+市场）。CEO必须全职或有足够精力投入，严禁挂名。必须展示核心成员的教育背景和与项目高度相关的过往业绩（Track Record）。",
     "weight": 8
   },
   {
-    "id": "BP_06_EQUITY",
+    "id": "BP_06",
     "category": "business",
-    "tags": ["股权", "股份", "分配", "控股"],
-    "content": "【依据：互联网+大赛评审规则-团队情况】股权结构必须清晰合理。学生团队必须拥有控股权（建议>51%），指导老师不宜持股过高，以免被评委质疑为“老师项目马甲”。",
+    "display_source": "《中国国际“互联网+”大学生创新创业大赛评审规则》- 团队情况",
+    "tags": ["股权", "股份", "分配", "控股", "架构"],
+    "content": "股权结构必须清晰合理。学生团队必须拥有控股权（建议>51%），指导老师不宜持股过高。师生共创组须特别说明知识产权分配和利益共享机制。",
     "weight": 7
   },
   {
-    "id": "BP_07_BARRIER",
+    "id": "BP_07",
     "category": "business",
-    "tags": ["壁垒", "护城河", "竞争", "优势", "SWOT"],
-    "content": "【依据：互联网+大赛评审规则-创新性】必须构建技术或商业壁垒（Moat）。仅靠“先发优势”不是真正的壁垒。建议通过SWOT分析或参数对比表，直观展示“人无我有，人有我优”的差异化优势。",
+    "display_source": "《中国国际“互联网+”大学生创新创业大赛评审规则》- 创新性维度",
+    "tags": ["壁垒", "竞争", "优势", "SWOT", "护城河"],
+    "content": "必须构建技术或商业壁垒（Moat）。仅靠“先发优势”不是真正的壁垒。建议通过SWOT分析或详细的技术参数对比表，直观展示“人无我有，人有我优”的差异化优势。",
     "weight": 9
   },
   {
-    "id": "BP_08_SOCIAL_VALUE",
+    "id": "BP_08",
     "category": "business",
-    "tags": ["社会价值", "就业", "扶贫", "乡村", "环保"],
-    "content": "【依据：互联网+大赛评审规则-社会效益】(尤其是红旅赛道) 必须量化项目的社会贡献。例如：带动多少人就业、帮助农民增收多少元、减少多少碳排放。禁止使用“具有巨大社会意义”等空泛描述。",
+    "display_source": "《中国国际“互联网+”大学生创新创业大赛评审规则》- 红旅/社会效益",
+    "tags": ["社会价值", "就业", "扶贫", "乡村", "环保", "公益"],
+    "content": "必须量化项目的社会贡献。例如：带动多少人直接/间接就业、帮助农民增收多少元、减少多少碳排放。禁止使用“具有巨大社会意义”等无法验证的空泛描述。",
     "weight": 8
   },
   {
-    "id": "BP_09_LANDING",
+    "id": "BP_09",
     "category": "business",
-    "tags": ["落地", "应用", "场景", "客户", "案例"],
-    "content": "【依据：互联网+大赛评审规则-商业性】必须展示落地能力。已有成型产品、样机或实际服务的客户案例（附合同/发票/照片）是核心加分项。仅有PPT概念将被判定为可行性低。",
+    "display_source": "《中国国际“互联网+”大学生创新创业大赛评审规则》- 商业性维度",
+    "tags": ["落地", "应用", "场景", "客户", "案例", "样机"],
+    "content": "必须展示落地能力。已有成型产品、样机或实际服务的客户案例（附合同、发票、实地照片）是核心加分项。仅有PPT概念将被判定为“可行性低”。",
     "weight": 9
   },
   {
-    "id": "BP_10_EDUCATION",
+    "id": "BP_10",
     "category": "business",
-    "tags": ["教育", "思政", "育人", "成长"],
-    "content": "【依据：互联网+大赛-高教主赛道】必须体现双创教育的育人成果。即项目如何反哺教学，如何体现“敢闯会创”的精神，以及团队成员在项目中的成长路径。",
+    "display_source": "《中国国际“互联网+”大学生创新创业大赛评审规则》- 高教主赛道",
+    "tags": ["教育", "思政", "育人", "成长", "引领"],
+    "content": "必须体现双创教育的育人成果。即项目如何反哺教学，如何体现“敢闯会创”的精神，以及团队成员在项目中的成长路径。单纯的商业赚钱项目在大赛中评分受限。",
     "weight": 6
   },
   {
-    "id": "BP_11_PATENT",
+    "id": "BP_11",
     "category": "business",
-    "tags": ["专利", "软著", "知识产权", "IP"],
-    "content": "【依据：互联网+大赛评审规则-创新性】核心技术必须拥有自主知识产权。必须列出专利号、软著登记号或论文发表情况。且知识产权必须归属于项目团队或公司，产权需无争议。",
+    "display_source": "《中国国际“互联网+”大学生创新创业大赛评审规则》- 创新性维度",
+    "tags": ["专利", "软著", "知识产权", "IP", "查新"],
+    "content": "核心技术必须拥有自主知识产权。必须列出专利号、软著登记号或权威机构查新报告。且知识产权必须归属于项目团队或公司，产权需无争议。",
     "weight": 8
   },
   {
-    "id": "BP_12_EXECUTION",
+    "id": "BP_12",
     "category": "business",
-    "tags": ["执行", "计划", "里程碑", "timeline"],
-    "content": "【依据：商业计划书通用规范】需包含明确的项目实施路线图（Roadmap）。分阶段设定可验证的里程碑（Milestone），展现团队的执行规划能力。",
+    "display_source": "《商业计划书通用撰写规范》- 执行规划",
+    "tags": ["执行", "计划", "里程碑", "timeline", "roadmap"],
+    "content": "需包含明确的项目实施路线图（Roadmap）。分阶段设定可验证的里程碑（Milestone），例如“2025年Q1完成原型，2025年Q3获得天使轮融资”，展现团队的执行规划能力。",
     "weight": 7
   },
   {
-    "id": "BP_13_FUNDS_USE",
+    "id": "BP_13",
     "category": "business",
-    "tags": ["融资", "资金用途", "出让"],
-    "content": "【依据：互联网+大赛评审规则-商业性】融资需求必须具体。说明融资金额、出让股份比例以及资金的具体用途（研发xx%、市场xx%），禁止笼统表述为“用于公司发展”。",
+    "display_source": "《商业计划书通用撰写规范》- 融资计划",
+    "tags": ["融资", "资金用途", "出让", "估值"],
+    "content": "融资需求必须具体。说明融资金额、出让股份比例、估值依据以及资金的具体用途（如：研发40%、市场30%），禁止笼统表述为“用于公司发展”。",
     "weight": 7
   },
   {
-    "id": "BP_14_RISK_CTRL",
+    "id": "BP_14",
     "category": "business",
-    "tags": ["风险", "对策", "挑战"],
-    "content": "【依据：商业计划书通用规范】必须包含风险分析与对策（技术、市场、政策、财务风险）。不仅要提出风险，更要给出切实可行的规避或应对方案。",
+    "display_source": "《商业计划书通用撰写规范》- 风险控制",
+    "tags": ["风险", "对策", "挑战", "应对"],
+    "content": "必须包含风险分析与对策（技术、市场、政策、财务风险）。不仅要提出风险，更要给出切实可行的规避或应对方案（Plan B）。",
     "weight": 6
   },
   {
-    "id": "ACAD_01_ABSTRACT_NORM",
+    "id": "BP_15",
+    "category": "business",
+    "display_source": "《中国国际“互联网+”大学生创新创业大赛评审规则》- 商业性维度",
+    "tags": ["竞品", "分析", "对比", "贬低"],
+    "content": "竞品分析不能只列出名字，必须深入分析其优劣势。禁止恶意贬低竞争对手，应客观陈述事实，并通过多维度的对比凸显自身的差异化定位。",
+    "weight": 8
+  },
+  {
+    "id": "ACAD_01",
     "category": "academic",
-    "tags": ["摘要", "summary", "abstract"],
-    "content": "【依据：GB/T 7713.2-2022 第4.2.3条】摘要必须包含四要素：目的(Purpose)、方法(Method)、结果(Result)、结论(Conclusion)。摘要应具有独立性和自明性，中文摘要一般在400字左右。",
+    "display_source": "GB/T 7713.2-2022《学术论文编写规则》第4.2.3条",
+    "tags": ["摘要", "summary", "abstract", "四要素"],
+    "content": "摘要应具有独立性和自明性。必须包含：目的(Purpose)、方法(Method)、结果(Result)、结论(Conclusion)四要素。中文摘要通常为300-500字，严禁出现“本文”、“作者”等第一人称主观描述。",
     "weight": 10
   },
   {
-    "id": "ACAD_02_NO_SUBJECTIVE",
+    "id": "ACAD_02",
     "category": "academic",
-    "tags": ["本文", "笔者", "我", "作者"],
-    "content": "【依据：GB/T 7713.2-2022】学术论文摘要和正文中严禁使用第一人称（如“本文”、“笔者”、“我们”）。应采用客观的被动语态或第三人称描述，如“本研究表明...”。",
+    "display_source": "GB/T 7713.2-2022《学术论文编写规则》- 语言规范",
+    "tags": ["本文", "笔者", "我", "作者", "第一人称"],
+    "content": "学术论文摘要和正文（除致谢外）中严禁使用第一人称（如“本文”、“笔者”、“我们”）。应采用客观的被动语态或第三人称描述，如“本研究表明...”或“实验结果显示...”。",
     "weight": 8
   },
   {
-    "id": "ACAD_03_KEYWORDS",
+    "id": "ACAD_03",
     "category": "academic",
-    "tags": ["关键词", "keywords"],
-    "content": "【依据：GB/T 7713.2-2022 第4.2.4条】关键词应从《汉语主题词表》中选取，数量一般为3-8个。关键词之间应用分号分隔，避免使用“研究”、“分析”等无检索意义的泛词。",
+    "display_source": "GB/T 7713.2-2022《学术论文编写规则》第4.2.4条",
+    "tags": ["关键词", "keywords", "索引"],
+    "content": "关键词应从《汉语主题词表》中选取，数量一般为3-8个。关键词之间应用分号分隔，不应使用无实际检索意义的泛词（如“研究”、“方法”、“实验”）。",
     "weight": 6
   },
   {
-    "id": "ACAD_04_INTRODUCTION",
+    "id": "ACAD_04",
     "category": "academic",
-    "tags": ["引言", "背景", "现状", "意义"],
-    "content": "【依据：杭电毕业论文规范】引言部分必须包含：研究背景、国内外研究现状综述、研究目的及意义。必须对前人研究进行客观评价，指出当前存在的不足或空白，从而引出本研究的必要性。",
+    "display_source": "《杭电毕业论文（设计）撰写规范》- 引言",
+    "tags": ["引言", "背景", "现状", "意义", "introduction"],
+    "content": "引言部分必须包含：研究背景、国内外研究现状综述、研究目的及意义。必须对前人研究进行客观评价，指出当前存在的不足或空白，从而逻辑性地引出本研究的必要性。",
     "weight": 9
   },
   {
-    "id": "ACAD_05_CITATION_CORR",
+    "id": "ACAD_05",
     "category": "academic",
-    "tags": ["引用", "参考文献", "文献", "[1]"],
-    "content": "【依据：GB/T 7713-1987】正文中引用的观点、数据必须在右上角标注参考文献角标（如[1]），且必须与文末参考文献列表一一对应。严禁“伪造引用”或“引用无关文献”。",
+    "display_source": "GB/T 7714-2015《信息与文献 参考文献著录规则》",
+    "tags": ["引用", "参考文献", "文献", "[1]", "角标"],
+    "content": "正文中引用的观点、数据、公式必须在右上角标注参考文献角标（如[1]），且必须与文末参考文献列表一一对应。严禁“伪造引用”或“引用未阅读的文献”。",
     "weight": 10
   },
   {
-    "id": "ACAD_06_FIGURE_TABLE",
+    "id": "ACAD_06",
     "category": "academic",
-    "tags": ["图表", "插图", "表格", "figure"],
-    "content": "【依据：GB/T 7713.2-2022 第5.4/5.5条】图表必须具有自明性。图题置于图下方，表题置于表上方。表格推荐使用“三线表”。正文中必须对图表进行显式的提及和分析（如“如图3所示...”）。",
+    "display_source": "GB/T 7713.2-2022《学术论文编写规则》第5.4/5.5条",
+    "tags": ["图表", "插图", "表格", "figure", "table"],
+    "content": "图表必须具有自明性（只看图不看文也能懂）。图题置于图下方，表题置于表上方。表格推荐使用“三线表”。正文中必须对图表进行显式的提及和分析（如“如图3所示...”）。",
     "weight": 7
   },
   {
-    "id": "ACAD_07_CONCLUSION",
+    "id": "ACAD_07",
     "category": "academic",
+    "display_source": "GB/T 7713.2-2022《学术论文编写规则》第4.3.4条",
     "tags": ["结论", "结语", "conclusion"],
-    "content": "【依据：GB/T 7713.2-2022 第4.3.4条】结论不是摘要的重复，而是对研究结果的理论升华。结论中不应出现正文中未提到的新事实或新数据。必须客观评价研究的局限性和未来的工作方向。",
+    "content": "结论不是摘要的重复，而是对研究结果的理论升华。结论中不应出现正文中未提到的新事实或新数据。必须客观评价研究的局限性（Limitations）和未来的工作方向。",
     "weight": 8
   },
   {
-    "id": "ACAD_08_LANGUAGE_OBJ",
+    "id": "ACAD_08",
     "category": "academic",
-    "tags": ["语言", "表达", "词汇"],
-    "content": "【依据：学术写作规范】语言必须准确、客观、简练。严禁使用口语化表达（如“特别棒”、“简直”）、文学修辞或带有强烈感情色彩的词汇（如“遗憾的是”、“令人震惊的是”）。",
+    "display_source": "《学术论文通用写作规范》",
+    "tags": ["语言", "表达", "词汇", "口语"],
+    "content": "学术语言必须准确、客观、简练。严禁使用口语化表达（如“特别棒”、“简直”）、文学修辞或带有强烈感情色彩的词汇（如“遗憾的是”、“令人震惊的是”）。",
     "weight": 8
   },
   {
-    "id": "ACAD_09_LOGIC_FLOW",
+    "id": "ACAD_09",
     "category": "academic",
-    "tags": ["逻辑", "推导", "因果", "论证"],
-    "content": "【依据：通用学术逻辑】论证过程必须严密，前提(Premise)与结论(Conclusion)之间必须有逻辑必然性。避免循环论证（Begging the question）和逻辑跳跃。",
+    "display_source": "《学术论文通用逻辑规范》",
+    "tags": ["逻辑", "推导", "因果", "论证", "循环"],
+    "content": "论证过程必须严密，前提(Premise)与结论(Conclusion)之间必须有逻辑必然性。严禁循环论证（Begging the question），即论据不能是论点的同义反复。",
     "weight": 9
   },
   {
-    "id": "ACAD_10_DATA_SOURCE",
+    "id": "ACAD_10",
     "category": "academic",
-    "tags": ["数据", "来源", "实验"],
-    "content": "【依据：GB/T 7713】所有实验数据和引用数据必须说明来源或获取方法。对于自行实验的数据，需描述实验环境和条件，保证可复现性。",
+    "display_source": "GB/T 7713-1987《科学技术报告、学位论文和学术论文的编写格式》",
+    "tags": ["数据", "来源", "实验", "data"],
+    "content": "所有实验数据和引用数据必须说明来源或获取方法。对于自行实验的数据，需清晰描述实验环境、实验条件和参数设置，保证科学研究的可复现性（Reproducibility）。",
     "weight": 9
   },
   {
-    "id": "ACAD_11_UNITS",
+    "id": "ACAD_11",
     "category": "academic",
-    "tags": ["单位", "量纲", "符号"],
-    "content": "【依据：GB 3100 / ISO 80000】量和单位的使用必须符合国家标准。严禁使用已废弃的单位（如“亩”、“斤”、“ppm”等，应转换为公顷、千克、10^-6）。变量符号应用斜体，单位符号用正体。",
+    "display_source": "GB 3100《国际单位制及其应用》",
+    "tags": ["单位", "量纲", "符号", "units"],
+    "content": "量和单位的使用必须符合国家标准。严禁使用已废弃的单位（如“亩”、“斤”、“ppm”等，应转换为公顷、千克、10^-6）。变量符号应用斜体，单位符号用正体。",
     "weight": 7
   },
   {
-    "id": "ACAD_12_HEADINGS",
+    "id": "ACAD_12",
     "category": "academic",
-    "tags": ["标题", "层次", "编号"],
-    "content": "【依据：GB/T 7713.2-2022 第5.2条】正文标题编号应采用阿拉伯数字分级编号（如 1, 1.1, 1.1.1），一般不超过4级。各层级标题应简练明确。",
+    "display_source": "GB/T 7713.2-2022《学术论文编写规则》第5.7条",
+    "tags": ["公式", "符号", "变量", "formula"],
+    "content": "数学公式应另行居中排版。公式中首次出现的变量符号必须在下文进行解释说明（where X stands for...）。公式编号应右对齐（如(1)）。",
     "weight": 6
   },
   {
-    "id": "ACAD_13_TERM_DEF",
+    "id": "ACAD_13",
     "category": "academic",
-    "tags": ["定义", "术语", "概念"],
-    "content": "【依据：学术写作规范】专业术语在文中首次出现时必须定义或解释，并标注英文全称缩写（如有）。全文术语的使用必须保持前后一致。",
-    "weight": 7
-  },
-  {
-    "id": "ACAD_14_THESIS_STATEMENT",
-    "category": "academic",
-    "tags": ["论点", "中心思想"],
-    "content": "【依据：杭电毕业论文规范】全篇论文应围绕一个核心论点（Thesis Statement）展开。避免多主题分散，导致文章结构松散。",
+    "display_source": "《杭电毕业论文（设计）撰写规范》",
+    "tags": ["实验", "验证", "对比", "baseline"],
+    "content": "工程类论文必须包含实验验证章节。必须建立基准（Baseline）并进行对比实验（A/B Test），用详实的数据和图表证明提出方法的有效性或先进性。",
     "weight": 9
   },
   {
-    "id": "TECH_01_HALLUCINATION",
-    "category": "general",
-    "tags": ["幻觉", "事实", "真实性", "虚构"],
-    "content": "【依据：Factuality of LLMs Survey】严格区分“事实”与“生成内容”。对于具体的人物、时间、地点、法规名称，系统需警惕模型产生的“事实性幻觉”。如无外部知识库验证，建议对此类信息进行标记或弱化表述。",
-    "weight": 9
-  },
-  {
-    "id": "TECH_02_SNOWBALLING",
-    "category": "general",
-    "tags": ["错误累积", "推导", "连贯"],
-    "content": "【依据：Factuality of LLMs Survey】警惕“雪球效应（Snowballing Hallucination）”，即基于一个错误的前提推导出一连串错误的结论。如果基础假设存疑，后续论证必须被打断。",
-    "weight": 8
-  },
-  {
-    "id": "TECH_03_VERIFIABILITY",
-    "category": "general",
-    "tags": ["可验证", "来源", "check"],
-    "content": "【依据：Factuality of LLMs Survey】所有非公理性的事实陈述，应当具备“可验证性（Verifiability）”。若通过搜索引擎无法验证该陈述，则极有可能是模型生成的噪音。",
+    "id": "ACAD_14",
+    "category": "academic",
+    "display_source": "《学术论文通用写作规范》",
+    "tags": ["定义", "术语", "概念", "def"],
+    "content": "专业术语在文中首次出现时必须定义或解释，并标注英文全称缩写（如有）。全文术语的使用必须保持前后一致（Consistency），严禁同一概念混用不同词汇。",
     "weight": 7
   },
   {
-    "id": "TECH_04_AGENT_PLANNING",
+    "id": "TECH_01",
     "category": "technical",
-    "tags": ["规划", "计划", "Agent", "任务"],
-    "content": "【依据：Magentic-One Architecture】对于复杂任务，Agent必须先生成“计划（Plan）”再执行。Orchestrator（编排器）必须维护一个任务账本（Task Ledger），显式追踪当前进度和已完成步骤。",
+    "display_source": "Factuality of Large Language Models: A Survey (2024)",
+    "tags": ["幻觉", "事实", "真实性", "虚构", "hallucination"],
+    "content": "区分“事实”与“生成内容”。对于具体的人物、时间、地点、法规名称、论文引用，系统需警惕模型产生的“事实性幻觉”。如无外部知识库验证，必须对此类信息进行Fact Check。",
+    "weight": 9
+  },
+  {
+    "id": "TECH_02",
+    "category": "technical",
+    "display_source": "Factuality of Large Language Models: A Survey (2024)",
+    "tags": ["错误累积", "推导", "snowballing"],
+    "content": "警惕“雪球效应（Snowballing Hallucination）”，即基于一个错误的前提推导出一连串错误的结论。如果基础假设（如某不存在的API）存疑，后续的所有逻辑推导应被标记为无效。",
     "weight": 8
   },
   {
-    "id": "TECH_05_LOOP_DETECTION",
+    "id": "TECH_03",
     "category": "technical",
+    "display_source": "Magentic-One: A Generalist Multi-Agent System (Microsoft)",
+    "tags": ["规划", "计划", "Agent", "任务", "task"],
+    "content": "对于复杂任务，Agent必须先生成“计划（Plan）”再执行。Orchestrator（编排器）必须维护一个任务账本（Task Ledger），显式追踪当前进度，而非隐式依赖上下文。",
+    "weight": 8
+  },
+  {
+    "id": "TECH_04",
+    "category": "technical",
+    "display_source": "Magentic-One: A Generalist Multi-Agent System (Microsoft)",
     "tags": ["死循环", "重复", "Loop", "Stall"],
-    "content": "【依据：Magentic-One Architecture】多智能体系统必须具备“死循环检测机制”。当Agent连续多次执行无效动作或重复相同步骤时，Orchestrator必须强制干预、回滚或切换策略。",
+    "content": "多智能体系统必须具备“死循环检测机制”。当Agent连续多次执行无效动作或重复相同步骤时，Orchestrator必须识别进度停滞（Stall），并强制干预或重置策略。",
     "weight": 8
   },
   {
-    "id": "TECH_06_ERROR_RECOVERY",
+    "id": "TECH_05",
     "category": "technical",
-    "tags": ["容错", "恢复", "报错"],
-    "content": "【依据：Magentic-One Architecture】系统必须设计完善的错误恢复（Error Recovery）流程。当子任务失败时，不应直接崩溃，而应尝试自我修正、请求人类协助或跳过非关键步骤。",
+    "display_source": "Magentic-One: A Generalist Multi-Agent System (Microsoft)",
+    "tags": ["容错", "恢复", "报错", "recovery"],
+    "content": "系统必须设计完善的错误恢复（Error Recovery）流程。当子Agent任务失败时，Orchestrator不应直接报错退出，而应尝试更换Agent、修正Prompt或跳过非关键步骤。",
     "weight": 8
   },
   {
-    "id": "TECH_07_ROLE_SPECIALIZATION",
+    "id": "TECH_06",
     "category": "technical",
-    "tags": ["分工", "角色", "专职"],
-    "content": "【依据：Magentic-One Architecture】Agent的职能应当单一且专业化（如WebSurfer专职浏览，Coder专职写代码）。避免创建一个“全能神Agent”，这会导致指令跟随能力下降。",
+    "display_source": "Magentic-One: A Generalist Multi-Agent System (Microsoft)",
+    "tags": ["分工", "角色", "专职", "role"],
+    "content": "Agent的职能应当单一且专业化（如WebSurfer专职浏览，Coder专职写代码）。避免创建一个“全能神Agent”，这会导致指令跟随能力和任务完成率下降。",
     "weight": 7
   },
   {
-    "id": "TECH_08_REFLECTION",
+    "id": "TECH_07",
     "category": "technical",
-    "tags": ["反思", "优化", "Self-reflection"],
-    "content": "【依据：Magentic-One / Reflexion】在任务执行的关键节点，Agent应进行“自我反思（Self-reflection）”，评估当前产出是否符合初始目标，并根据评估结果调整后续行动。",
+    "display_source": "Reflexion: Language Agents with Verbal Reinforcement Learning",
+    "tags": ["反思", "优化", "Self-reflection", "reflection"],
+    "content": "在任务执行的关键节点（如代码运行报错后），Agent应进行“自我反思（Self-reflection）”，分析错误原因，并根据反思结果调整下一步的Prompt或Action。",
     "weight": 7
   },
   {
-    "id": "TECH_09_TOOL_USE",
+    "id": "TECH_08",
     "category": "technical",
-    "tags": ["工具", "API", "调用"],
-    "content": "【依据：Magentic-One Architecture】Agent使用工具（如浏览器、Python解释器）时，必须能够解析工具的返回值（包括错误信息），并根据返回值进行逻辑分支判断。",
-    "weight": 7
-  },
-  {
-    "id": "TECH_10_SAFETY_BOUND",
-    "category": "technical",
-    "tags": ["安全", "边界", "风险"],
-    "content": "【依据：Magentic-One Risks】Agent执行操作（尤其是网页浏览和文件操作）必须在沙箱或受控环境中进行。严禁Agent直接处理用户的敏感隐私信息或执行不可逆的系统级操作。",
+    "display_source": "Magentic-One System Risks & Mitigations",
+    "tags": ["安全", "边界", "风险", "safety"],
+    "content": "Agent执行操作（尤其是网页浏览和文件操作）必须在受控环境（如Container）中进行。严禁Agent直接处理用户的敏感隐私信息（PII）或执行不可逆的系统级操作。",
     "weight": 9
   },
   {
-    "id": "GEN_01_CLARITY",
+    "id": "GEN_01",
     "category": "general",
-    "tags": ["清晰", "简洁", "冗余"],
-    "content": "【依据：通用逻辑】文本表达应遵循“奥卡姆剃刀”原则，删除无意义的冗余修饰。避免长难句堆砌，确保核心信息能被读者快速捕捉。",
+    "display_source": "《通用写作逻辑规范》- 简洁性原则",
+    "tags": ["清晰", "简洁", "冗余", "废话"],
+    "content": "文本表达应遵循“奥卡姆剃刀”原则，删除无意义的冗余修饰。避免长难句堆砌，确保核心信息（论点、数据、结论）能被读者快速捕捉。",
     "weight": 6
   },
   {
-    "id": "GEN_02_STRUCTURE",
+    "id": "GEN_02",
     "category": "general",
-    "tags": ["结构", "层次", "排版"],
-    "content": "【依据：金字塔原理】文本结构应“结论先行，以上统下”。段落之间应有明确的逻辑递进关系（并列、递进、因果），避免思维跳跃。",
+    "display_source": "《金字塔原理 (The Pyramid Principle)》",
+    "tags": ["结构", "层次", "排版", "逻辑树"],
+    "content": "文本结构应遵循“结论先行，以上统下，归类分组，逻辑递进”。段落之间应有明确的逻辑关系（并列、递进、因果），避免思维跳跃。",
     "weight": 7
   },
   {
-    "id": "GEN_03_CONSISTENCY",
+    "id": "GEN_03",
     "category": "general",
-    "tags": ["一致性", "矛盾", "前后"],
-    "content": "【依据：通用逻辑】全文的观点、数据、术语和人称必须保持一致。严禁出现“前文说增长30%，后文说增长50%”的自相矛盾。",
+    "display_source": "《通用逻辑校验规范》",
+    "tags": ["一致性", "矛盾", "前后", "consistency"],
+    "content": "全文的观点、数据、术语和人称必须保持一致。严禁出现“前文说增长30%，后文说增长50%”的自相矛盾，或对同一对象的称呼前后不一。",
     "weight": 8
   },
   {
-    "id": "GEN_04_TONE",
+    "id": "GEN_04",
     "category": "general",
-    "tags": ["语气", "态度", "风格"],
-    "content": "【依据：文体规范】根据写作场景调整语气。商业计划书应自信且务实，学术论文应严谨且谦逊。避免在正式文档中使用网络流行语或过于随意的表达。",
+    "display_source": "《专业文档写作风格指南》",
+    "tags": ["语气", "态度", "风格", "tone"],
+    "content": "根据写作场景调整语气。商业计划书应自信、务实且具有感染力；学术论文应严谨、客观且谦逊。避免在正式文档中使用网络流行语或过于随意的表达。",
     "weight": 6
-  },
-  {
-    "id": "BP_15_COMPETITION_ANALYSIS",
-    "category": "business",
-    "tags": ["竞品", "分析", "对比"],
-    "content": "【依据：互联网+大赛评审规则-商业性】竞品分析不能只列出名字，必须深入分析其优劣势。禁止贬低竞争对手，应客观陈述事实，并通过对比凸显自身的差异化定位。",
-    "weight": 8
-  },
-  {
-    "id": "BP_16_CUSTOMER_PORTRAIT",
-    "category": "business",
-    "tags": ["用户", "画像", "客户群"],
-    "content": "【依据：互联网+大赛评审规则-商业性】目标客户画像（Persona）必须清晰。不能笼统地说“所有大学生”，而应精确到“一二线城市、热衷二次元文化的大学生群体”。",
-    "weight": 8
-  },
-  {
-    "id": "BP_17_MILESTONE",
-    "category": "business",
-    "tags": ["里程碑", "规划", "阶段"],
-    "content": "【依据：商业计划书通用规范】项目发展规划应设定清晰的里程碑节点（如：2025年Q1完成原型，2025年Q3获得种子轮融资）。每个节点应有可量化的考核指标。",
-    "weight": 7
-  },
-  {
-    "id": "ACAD_15_REFERENCE_FORMAT",
-    "category": "academic",
-    "tags": ["参考文献", "格式", "GB7714"],
-    "content": "【依据：GB/T 7714-2015】参考文献著录格式必须规范。如期刊：[序号]作者.题名[J].刊名,出版年份,卷(期):起止页码。严禁格式混乱。",
-    "weight": 7
-  },
-  {
-    "id": "ACAD_16_FORMULA",
-    "category": "academic",
-    "tags": ["公式", "符号", "变量"],
-    "content": "【依据：GB/T 7713.2-2022 第5.7条】数学公式应另行居中排版。公式中首次出现的变量符号必须在下文进行解释说明（where X stands for...）。公式编号应右对齐。",
-    "weight": 6
-  },
-  {
-    "id": "ACAD_17_EXPERIMENT",
-    "category": "academic",
-    "tags": ["实验", "验证", "对比"],
-    "content": "【依据：杭电毕业论文规范】工程类论文必须包含实验验证章节。通过对比实验（Baseline vs Proposed）证明方法的有效性。数据应详实，图表应直观。",
-    "weight": 9
-  },
-  {
-    "id": "BP_18_CHANNEL",
-    "category": "business",
-    "tags": ["渠道", "营销", "推广"],
-    "content": "【依据：互联网+大赛评审规则-商业性】营销策略必须落地。说明具体的推广渠道（线上/线下）和获客成本（CAC）。禁止仅列举“微信、微博、抖音”而不谈具体运营策略。",
-    "weight": 8
   }
 ]
