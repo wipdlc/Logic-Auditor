@@ -1,5 +1,7 @@
 // api/check.js
-import { KNOWLEDGE_BASE, detectScenario } from './knowledge_base.js';
+
+//导入了 retrieveRules 函数，并移除了不存在的 KNOWLEDGE_BASE
+import { detectScenario, retrieveRules } from './knowledge_base.js';
 
 export default async function handler(req, res) {
     // 1. 允许 CORS 跨域 (解决很多网络中断的玄学问题)
@@ -47,7 +49,9 @@ export default async function handler(req, res) {
         // 2. 准备场景与规则
         const scenarioKey = detectScenario(text);
         const scenarioName = scenarioKey === 'academic' ? '学术论文/答辩' : (scenarioKey === 'business' ? '商业计划书/创赛' : '通用逻辑陈述');
-        const rules = KNOWLEDGE_BASE[scenarioKey];
+        
+        // 调用 retrieveRules 函数来动态获取规则字符串
+        const rules = retrieveRules(text, scenarioKey);
 
         // 3. 构建高强度的逻辑审计 Prompt 
         const systemPrompt = `你是一个名为 "Logic Auditor" 的严苛逻辑审计与重构系统。
@@ -205,5 +209,3 @@ function extractByRegex(brokenJson, originalText) {
         revised_text: revisedText + "..." // 加上省略号示意截断
     };
 }
-
-
