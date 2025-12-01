@@ -206,10 +206,90 @@ textarea {
 .critique-item.expanded .c-footer { display: none; }
 
 /* 重构文 */
-.revised-paper { background: #fff; padding: 0 10px; line-height: 1.8; color: #374151; font-size: 1.05rem; }
-.revised-paper b { background: rgba(251, 191, 36, 0.3); color: #78350f; padding: 2px 4px; border-radius: 3px; }
+.revised-paper {
+    position: relative;
+    background: #ffffff;
+    /* 边框和圆角 */
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    /* 增加呼吸感，不要贴边 */
+    padding: 40px; 
+    padding-top: 50px; /* 给顶部按钮留出空间 */
+    margin-top: 10px;
+    /* 字体排版优化 */
+    font-size: 1.05rem;
+    line-height: 2; /* 行间距稍微加大，更易读 */
+    color: #374151;
+    text-align: justify; /* 两端对齐，显得整齐 */
+    /* 微微的立体感 */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+}
+
+/* 高亮样式 */
+.revised-paper b {
+    background: rgba(251, 191, 36, 0.25); /* 柔和黄底 */
+    color: #92400e; /* 深褐文字 */
+    padding: 2px 6px;
+    margin: 0 2px;
+    border-radius: 4px;
+    font-weight: 600;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+}
+
+/* 复制按钮美化 */
+.copy-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    
+    /* 按钮样式重做 */
+    background: #fff;
+    border: 1px solid #d1d5db;
+    color: #6b7280;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    
+    /* Flex布局让可能加图标时更好看 */
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.copy-btn:hover {
+    color: var(--primary);
+    border-color: var(--primary);
+    background: #eff6ff;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.copy-btn:active {
+    transform: translateY(0);
+    background: #f3f4f6;
+}
+
+/* 给按钮加个伪元素图标（可选，增加精致感） */
+.copy-btn::before {
+    content: "📋"; 
+    font-size: 0.9em;
+}
+
+/* 如果内容为空时的提示样式 */
+.revised-paper:empty::after {
+    content: "暂无重构内容";
+    color: #d1d5db;
+    text-align: center;
+    display: block;
+    padding: 20px;
+}
 
 /* 动画 */
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
 
