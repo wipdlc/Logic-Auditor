@@ -1,26 +1,25 @@
 /* style.css */
 :root {
-    --primary: #2563eb;       /* 科技蓝 (Tailwind Blue 600) */
+    --primary: #2563eb;       /* 核心科技蓝 */
     --primary-hover: #1d4ed8;
-    --bg-page: #f3f4f6;       /* 浅灰背景 */
-    --bg-panel: #ffffff;
-    --text-main: #1f2937;     /* 深灰黑 */
-    --text-sub: #6b7280;      /* 中灰 */
-    --border: #e5e7eb;        /* 浅边框 */
-    --radius: 16px;           /* 统一圆角 */
+    --bg-page: #f3f4f6;       /* 页面浅灰底 */
+    --bg-panel: #ffffff;      /* 卡片白底 */
+    --text-main: #1f2937;     /* 主文字色 */
+    --text-sub: #6b7280;      /* 辅助文字色 */
+    --border: #e5e7eb;        /* 边框色 */
+    --radius: 16px;           /* 统一大圆角 */
     
-    /* 动态漏洞卡片颜色池 */
+    /* 动态漏洞卡片颜色循环池 */
     --color-1: #ef4444; /* 红 */
     --color-2: #f59e0b; /* 橙 */
     --color-3: #3b82f6; /* 蓝 */
     --color-4: #8b5cf6; /* 紫 */
 }
 
-/* 1. 全局配置与字体优化 */
+/* 1. 全局 Reset 与字体 */
 body {
     margin: 0;
-    /* 现代化无衬线字体栈：优先 Mac/Win 系统字体，拒绝字体发虚 */
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     background-color: var(--bg-page);
     color: var(--text-main);
     display: flex;
@@ -32,19 +31,18 @@ body {
 
 .container {
     width: 100%;
-    max-width: 1100px;
+    max-width: 1100px; /* 大屏宽容器 */
     display: flex;
     flex-direction: column;
     gap: 20px;
 }
 
-/* 2. Header 样式 (左右布局版) */
+/* 2. Header (头部) */
 header {
     display: flex;
-    justify-content: space-between; /* 关键：两端对齐 */
+    justify-content: space-between;
     align-items: center;
     margin-bottom: 10px;
-    padding: 5px 0;
 }
 
 .brand {
@@ -52,71 +50,62 @@ header {
     align-items: center;
     gap: 12px;
 }
-
 .brand h1 {
     font-size: 1.6rem;
     margin: 0;
     color: #111827;
     letter-spacing: -0.5px;
 }
-
-/* 优化后的高级感标签 */
 .tag {
-    background: rgba(37, 99, 235, 0.08); /* 极淡的蓝色背景 */
+    background: rgba(37, 99, 235, 0.08);
     color: var(--primary);
     font-size: 0.75rem;
-    font-weight: 600;
+    font-weight: 700;
     padding: 4px 10px;
-    border-radius: 6px; /* 方圆角更现代 */
-    border: 1px solid rgba(37, 99, 235, 0.2); /* 细微描边 */
+    border-radius: 6px;
+    border: 1px solid rgba(37, 99, 235, 0.2);
     white-space: nowrap;
 }
 
-/* Header 右侧杭电元素 */
 .header-right {
     display: flex;
     align-items: center;
     gap: 12px;
 }
-
 .uni-name {
     font-size: 0.9rem;
-    font-weight: 500;
     color: var(--text-sub);
-    display: none; /* 手机端默认隐藏文字，只留Logo */
+    font-weight: 500;
+    display: none;
 }
+@media (min-width: 640px) { .uni-name { display: block; } }
 
-/* 在平板以上屏幕显示文字 */
-@media (min-width: 640px) {
-    .uni-name { display: block; }
-}
+.uni-logo { height: 38px; width: auto; }
 
-.uni-logo {
-    height: 38px; /* 控制Logo高度 */
-    width: auto;
-}
-
-/* 3. 主布局系统 */
+/* 3. Main Layout (上部分：输入+仪表盘) */
 main {
     display: flex;
     flex-direction: column;
     gap: 20px;
 }
 
-/* 上层布局：左侧输入 (约60%) + 右侧仪表盘 (约40%) */
 .top-wrapper {
     display: grid;
-    grid-template-columns: 1.6fr 1fr; 
+    grid-template-columns: 1.6fr 1fr; /* 左侧宽，右侧窄 */
     gap: 20px;
-    height: 380px;
+    height: 400px; /* 固定高度让布局更整齐 */
 }
 
-/* 通用面板样式 */
+@media (max-width: 768px) {
+    .top-wrapper { grid-template-columns: 1fr; height: auto; }
+}
+
+/* 4. 通用面板 Panel 样式 */
 .panel {
     background: var(--bg-panel);
     border-radius: var(--radius);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-    border: 1px solid rgba(255,255,255,0.7); /* 提升质感 */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(255,255,255,0.6);
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -125,7 +114,10 @@ main {
 .panel-header {
     padding: 14px 20px;
     border-bottom: 1px solid var(--border);
-    background: #fafafa; /* 极浅灰顶栏 */
+    background: #fafafa;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .panel-header h2 {
@@ -133,12 +125,9 @@ main {
     margin: 0;
     color: #4b5563;
     font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 6px;
 }
 
-/* 左上：输入区 */
+/* 5. 输入面板特定样式 */
 .input-panel textarea {
     flex: 1;
     border: none;
@@ -146,13 +135,33 @@ main {
     font-family: inherit;
     font-size: 1rem;
     line-height: 1.7;
-    resize: none;
+    resize: none; /* 禁止手动拉伸 */
     outline: none;
     color: #374151;
     background: transparent;
 }
 .input-panel textarea::placeholder { color: #d1d5db; }
+/* 当被 PDF 解析禁用时的样式 */
+.input-panel textarea:disabled { color: #6b7280; background: #f9fafb; cursor: progress; }
 
+/* 上传按钮 */
+.upload-btn {
+    background: #eff6ff;
+    border: 1px dashed #3b82f6;
+    color: var(--primary);
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.upload-btn:hover { background: #dbeafe; transform: translateY(-1px); }
+
+/* 底部操作栏 */
 .action-bar {
     padding: 12px 20px;
     border-top: 1px solid var(--border);
@@ -174,23 +183,12 @@ main {
     transition: all 0.2s;
     display: flex;
     align-items: center;
-    box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
 }
-#submitBtn:hover {
-    background: var(--primary-hover);
-    transform: translateY(-1px);
-}
-#submitBtn:disabled {
-    background: #e5e7eb;
-    color: #9ca3af;
-    cursor: not-allowed;
-    box-shadow: none;
-    transform: none;
-}
+#submitBtn:hover { background: var(--primary-hover); transform: translateY(-1px); }
+#submitBtn:disabled { background: #e5e7eb; color: #9ca3af; cursor: not-allowed; box-shadow: none; transform: none; }
 
-/* 右上：仪表盘 */
-.dashboard-panel { position: relative; }
-
+/* 6. 仪表盘 Dashboard 样式 */
 .dashboard-content {
     flex: 1;
     padding: 20px;
@@ -198,7 +196,7 @@ main {
     flex-direction: column;
 }
 
-/* 待机模式 */
+/* 思考中/空闲模式 */
 .center-mode {
     justify-content: center;
     align-items: center;
@@ -207,56 +205,61 @@ main {
 }
 .pulse-icon {
     font-size: 3rem;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
     opacity: 0.8;
     animation: pulse 2s infinite;
+}
+#statusText {
+    line-height: 1.6;
+    font-family: monospace; /* 终端科技感 */
+    font-size: 0.9rem;
 }
 
 /* 结果模式 */
 .result-mode {
-    justify-content: space-evenly; /* 分布更均匀 */
     align-items: center;
+    justify-content: flex-start;
+    gap: 20px;
     animation: fadeIn 0.5s ease;
 }
 
-/* 环形评分图表 */
-.score-container { position: relative; width: 130px; height: 130px; }
+/* 圆环评分图 */
+.score-container { position: relative; width: 120px; height: 120px; margin-top: 10px; }
 .circular-chart { display: block; margin: 0 auto; max-width: 100%; max-height: 100%; }
-.circle-bg { fill: none; stroke: #f3f4f6; stroke-width: 2.8; }
+.circle-bg { fill: none; stroke: #f3f4f6; stroke-width: 2.5; }
 .circle {
     fill: none;
-    stroke-width: 2.8;
+    stroke-width: 2.5;
     stroke-linecap: round;
-    transition: stroke-dasharray 1.2s ease-out; /* 更平滑的动画 */
+    transition: stroke-dasharray 1s ease-out;
     stroke: var(--primary);
 }
 .percentage {
     fill: #111827;
-    font-family: inherit;
-    font-weight: 700;
-    font-size: 0.6em;
+    font-family: sans-serif;
+    font-weight: 800;
+    font-size: 0.55em;
     text-anchor: middle;
-    transform: translateY(0.1em);
 }
 .score-container .label {
     position: absolute;
-    bottom: -25px;
+    bottom: -22px;
     width: 100%;
     text-align: center;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     color: var(--text-sub);
 }
 
+/* 元数据块 */
 .meta-info {
     width: 100%;
-    margin-top: 10px;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 15px;
+    gap: 12px;
 }
 .meta-item {
     background: #f9fafb;
-    padding: 12px 10px;
+    padding: 10px;
     border-radius: 8px;
     text-align: center;
     border: 1px solid #f3f4f6;
@@ -264,7 +267,30 @@ main {
 .meta-item .label { display: block; font-size: 0.75rem; color: #9ca3af; margin-bottom: 4px; }
 .meta-item strong { display: block; font-size: 1rem; color: #1f2937; }
 
-/* 4. 下半部分：Tab 内容 */
+/* 思维链展示 (Logic Trace) - 新增核心 */
+.thought-trace {
+    width: 100%;
+    background: #fffbeb; /* 浅黄 */
+    border: 1px solid #fde68a;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 0.85rem;
+    color: #92400e;
+    line-height: 1.4;
+    text-align: left;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
+.trace-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #b45309;
+    margin-bottom: 5px;
+}
+
+/* 7. 详情区 Detail Panel (Tabs) */
 .details-panel { min-height: 400px; }
 .tabs {
     display: flex;
@@ -280,47 +306,59 @@ main {
     color: var(--text-sub);
     cursor: pointer;
     border-bottom: 2px solid transparent;
-    transition: color 0.2s;
 }
 .tab-btn:hover { color: var(--text-main); }
 .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
 .tab-content { display: none; padding: 25px; }
 .tab-content.active { display: block; animation: slideUp 0.3s ease; }
 
-/* 🌈 漏洞卡片 - 多彩边框系统 */
+/* 漏洞卡片 List */
 #critiquesList { padding: 0; margin: 0; list-style: none; }
 
 .critique-item {
     background: #fff;
     border: 1px solid var(--border);
-    border-left-width: 5px; /* 左侧粗边框 */
+    border-left-width: 5px;
     border-radius: 8px;
     padding: 20px;
-    margin-bottom: 15px;
+    margin-bottom: 16px;
     cursor: pointer;
     transition: all 0.2s;
-    position: relative;
 }
-
 .critique-item:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 16px rgba(0,0,0,0.06);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.05);
 }
 
-/* 循环上色逻辑 */
+/* 循环配色 */
 .critique-item:nth-child(4n+1) { border-left-color: var(--color-1); }
-.critique-item:nth-child(4n+1) .q-issue { color: var(--color-1); }
+.critique-item:nth-child(4n+1) .q-issue span { color: var(--color-1); }
 
 .critique-item:nth-child(4n+2) { border-left-color: var(--color-2); }
-.critique-item:nth-child(4n+2) .q-issue { color: var(--color-2); }
+.critique-item:nth-child(4n+2) .q-issue span { color: var(--color-2); }
 
 .critique-item:nth-child(4n+3) { border-left-color: var(--color-3); }
-.critique-item:nth-child(4n+3) .q-issue { color: var(--color-3); }
+.critique-item:nth-child(4n+3) .q-issue span { color: var(--color-3); }
 
 .critique-item:nth-child(4n+4) { border-left-color: var(--color-4); }
-.critique-item:nth-child(4n+4) .q-issue { color: var(--color-4); }
+.critique-item:nth-child(4n+4) .q-issue span { color: var(--color-4); }
 
+/* 卡片内部排版 */
 .q-issue { font-weight: 700; font-size: 1.05rem; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+
+/* 规则引用 Tag - 关键 */
+.rule-ref {
+    display: inline-block;
+    background: #f3f4f6;
+    color: #4b5563;
+    font-size: 0.8rem;
+    font-family: monospace;
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: 1px solid #e5e7eb;
+    margin-bottom: 12px;
+}
+
 .q-quote {
     background: #f9fafb;
     padding: 12px;
@@ -334,53 +372,52 @@ main {
     margin-top: 15px;
     padding-top: 15px;
     border-top: 1px dashed var(--border);
-    display: none; /* 默认隐藏 */
+    display: none; /* 默认隐藏修复建议 */
     color: #374151;
+    line-height: 1.6;
+}
+.expand-hint {
+    font-size: 0.75rem; color: #9ca3af; text-align: right; margin-top: 8px;
 }
 .critique-item.expanded .q-fix { display: block; animation: fadeIn 0.3s; }
 
-/* 重构文稿区域 */
+/* 重构文 */
 .revised-paper {
     background: #fff;
     border: 1px solid var(--border);
     padding: 40px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.02);
-    line-height: 1.9;
     font-size: 1.05rem;
+    line-height: 1.8;
+    color: #374151;
     position: relative;
     max-width: 800px;
     margin: 0 auto;
-    color: #1f2937;
 }
-/* 重构文稿中的高亮样式 */
 .revised-paper b {
-    background: rgba(250, 173, 20, 0.2); /* 柔和黄 */
-    color: #9254de; /* 改用稍微深一点的紫色或者深褐色，此处用紫色增强对比 */
-    color: #b45309; /* 还是用深琥珀色比较稳重 */
-    padding: 2px 4px;
-    border-radius: 4px;
+    background: rgba(251, 191, 36, 0.2);
+    color: #92400e;
+    padding: 0 4px;
+    border-radius: 3px;
     font-weight: 600;
 }
 .copy-btn {
     position: absolute;
-    top: 15px;
-    right: 15px;
-    padding: 6px 12px;
-    background: #f9fafb;
+    top: 10px; right: 10px;
+    background: #f3f4f6;
     border: 1px solid #e5e7eb;
+    padding: 6px 10px;
     border-radius: 6px;
     cursor: pointer;
     font-size: 0.8rem;
-    color: var(--text-sub);
-    transition: background 0.2s;
+    color: #6b7280;
 }
-.copy-btn:hover { background: #e5e7eb; color: var(--text-main); }
+.copy-btn:hover { background: #e5e7eb; color: #374151; }
 
-/* 动画定义 */
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-@keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+/* 动画类 */
 @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 @keyframes pulse { 0% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.1); opacity: 1; } 100% { transform: scale(1); opacity: 0.8; } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
 .loader {
     border: 2px solid rgba(255,255,255,0.3);
@@ -388,15 +425,7 @@ main {
     border-radius: 50%;
     width: 14px;
     height: 14px;
-    animation: spin 1s linear infinite;
+    animation: spin 0.8s linear infinite;
     display: none;
     margin-left: 8px;
-}
-
-/* 移动端适配 */
-@media (max-width: 768px) {
-    .top-wrapper { grid-template-columns: 1fr; height: auto; }
-    .input-panel { height: 300px; }
-    header { flex-direction: column; align-items: flex-start; gap: 10px; }
-    .header-right { width: 100%; justify-content: flex-end; }
 }
