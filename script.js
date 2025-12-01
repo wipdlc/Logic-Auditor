@@ -1,14 +1,15 @@
 // script.js
 document.addEventListener('DOMContentLoaded', () => {
-    let fullPdfText = "";
+    let fullDocText = ""; // 存储合并后的所有文本
     
-    // DOM 元素获取 
     const el = {
         input: document.getElementById('inputText'),
         btn: document.getElementById('submitBtn'),
         btnText: document.querySelector('.btn-text'),
         loader: document.querySelector('.loader'),
         charCount: document.querySelector('.char-count'),
+        
+        // 状态与结果面板
         statusState: document.getElementById('statusState'),
         resultState: document.getElementById('resultState'),
         statusText: document.getElementById('statusText'),
@@ -17,124 +18,182 @@ document.addEventListener('DOMContentLoaded', () => {
         sceneResult: document.getElementById('sceneResult'),
         issueCount: document.getElementById('issueCount'),
         thoughtTrace: document.getElementById('thoughtTrace'),
+        
+        // 详情面板
         detailsSection: document.getElementById('detailsSection'),
         critiquesList: document.getElementById('critiquesList'),
         revisedText: document.getElementById('revisedText'),
         tabs: document.querySelectorAll('.tab-btn'),
         tabContents: document.querySelectorAll('.tab-content'),
-        pdfInput: document.getElementById('pdfUpload'),
+        
+        // 文件上传部分
+        fileInput: document.getElementById('genericFileUpload'), // ID已更新
         filePreviewArea: document.getElementById('filePreviewArea'),
         fileNameDisplay: document.getElementById('fileNameDisplay'),
         removeFileBtn: document.getElementById('removeFileBtn')
     };
 
-    // --- 辅助函数：智能去重 ---
-    function isDuplicateCritique(newItem, existingList) {
-        return existingList.some(oldItem => {
-            // 1. 如果 issue 标题完全相同，视为重复
-            if (oldItem.issue === newItem.issue) return true;
-            
-            // 2. 如果 rule_ref 相同，且引用原文高度重叠，视为重复
-            if (oldItem.rule_ref === newItem.rule_ref) {
-                const q1 = oldItem.quote.trim();
-                const q2 = newItem.quote.trim();
-                // 检查是否包含关系 (处理切片截断导致的长短不一)
-                if (q1.includes(q2) || q2.includes(q1)) return true;
-            }
-            return false;
-        });
-    }
+    // ==========================================
+    // 1. 多格式多文件解析核心逻辑
+    // ==========================================
+    el.fileInput.addEventListener('change', async (e) => {
+        const files = Array.from(e.target.files);
+        if (files.length === 0) return;
 
-    // 1. PDF 解析逻辑 
-    el.pdfInput.addEventListener('change', async (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        if (file.type !== 'application/pdf') { alert('仅支持 PDF'); return; }
+        // 限制数量
+        if (files.length > 3) {
+            alert("⚠️ 单次最多支持上传 3 个文件！");
+            el.fileInput.value = ""; // 清空
+            return;
+        }
 
+        // 锁定界面
         el.input.disabled = true;
-        el.charCount.textContent = "解析 PDF 结构中...";
+        el.charCount.textContent = `📚 正在解析 ${files.length} 个文件...`;
         
+        fullDocText = ""; // 重置内容
+        let successCount = 0;
+        let fileNames = [];
+
         try {
-            const arrayBuffer = await file.arrayBuffer();
-            const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
-            fullPdfText = "";
-            for (let i = 1; i <= pdf.numPages; i++) {
-                const page = await pdf.getPage(i);
-                const textContent = await page.getTextContent();
-                // 简单的空格连接，保留一定的原始格式
-                fullPdfText += textContent.items.map(item => item.str).join(' ') + "\n\n";
+            // 并行或者串行处理文件
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const ext = file.name.split('.').pop().toLowerCase();
+                
+                el.input.value = `正在解析 (${i+1}/${files.length}): ${file.name}...`;
+                let text = "";
+
+                // --- 格式分发器 ---
+                if (ext === 'pdf') {
+                    text = await parsePdf(file);
+                } else if (ext === 'docx') {
+                    text = await parseDocx(file);
+                } else if (ext === 'txt') {
+                    text = await parseTxt(file);
+                } else {
+                    console.warn(`跳过不支持的格式: ${file.name}`);
+                    continue;
+                }
+
+                if (text.trim().length > 0) {
+                    fullDocText += `\n=== 文件: ${file.name} ===\n${text}\n`;
+                    fileNames.push(file.name);
+                    successCount++;
+                }
             }
-            
+
+            if (successCount === 0) {
+                throw new Error("没有成功提取到有效文本");
+            }
+
+            // 更新 UI 为文件卡片状态
             el.input.style.display = 'none';
             el.filePreviewArea.style.display = 'flex';
-            el.fileNameDisplay.textContent = file.name;
-            el.charCount.textContent = `✅ 共 ${pdf.numPages} 页 (${fullPdfText.length} 字符)`;
+            
+            // 如果只有1个文件显示全名，多个文件显示概览
+            if (fileNames.length === 1) {
+                el.fileNameDisplay.textContent = fileNames[0];
+            } else {
+                el.fileNameDisplay.textContent = `${fileNames[0]} 等 ${fileNames.length} 个文件`;
+            }
+
+            el.charCount.textContent = `✅ 解析完成 | 共 ${successCount} 个文件 (${fullDocText.length} 字符)`;
             el.charCount.style.color = '#10b981';
-            el.input.value = ""; 
-        } catch (err) {
-            console.error(err);
-            alert("PDF 解析失败");
+            el.input.value = ""; // 清空 textarea 显示
+
+        } catch (error) {
+            console.error("File Parse Error:", error);
+            alert(`文件解析失败: ${error.message}`);
             resetInput();
         } finally {
             el.input.disabled = false;
         }
     });
 
+    // --- 子解析器：PDF ---
+    async function parsePdf(file) {
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
+        let txt = "";
+        for (let i = 1; i <= pdf.numPages; i++) {
+            const page = await pdf.getPage(i);
+            const content = await page.getTextContent();
+            txt += content.items.map(item => item.str).join(' ') + "\n";
+        }
+        return txt;
+    }
+
+    // --- 子解析器：Word (Docx) ---
+    async function parseDocx(file) {
+        const arrayBuffer = await file.arrayBuffer();
+        // 使用 mammoth 提取纯文本
+        const result = await mammoth.extractRawText({ arrayBuffer: arrayBuffer });
+        return result.value; // The raw text
+    }
+
+    // --- 子解析器：TXT ---
+    function parseTxt(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) => resolve(e.target.result);
+            reader.onerror = (e) => reject(e);
+            reader.readAsText(file);
+        });
+    }
+
+    // 移除文件逻辑
     el.removeFileBtn.addEventListener('click', resetInput);
     function resetInput() {
-        fullPdfText = "";
+        fullDocText = "";
         el.input.value = "";
+        el.fileInput.value = "";
         el.input.style.display = 'block';
         el.filePreviewArea.style.display = 'none';
         el.charCount.textContent = "Ready";
+        el.charCount.style.color = "#9ca3af";
     }
 
-    // 🔥 2. 核心分片处理逻辑
+    // ==========================================
+    // 2. 提交与切片逻辑 (分卷防超时)
+    // ==========================================
     el.btn.addEventListener('click', async () => {
-        const textToProcess = fullPdfText || el.input.value.trim();
-        if (textToProcess.length < 10) return alert("内容太少");
+        // 优先使用解析后的文件文本，否则使用输入框文本
+        const textToProcess = fullDocText || el.input.value.trim();
+        
+        if (textToProcess.length < 10) return alert("内容太少，请提供更多信息。");
 
-        // UI 状态重置
+        // 二次重置显示
         if (el.resultState.style.display === 'flex') {
              el.resultState.style.display = 'none';
              el.statusState.style.display = 'flex';
              el.statusText.innerHTML = "♻️ 正在初始化 Logic Auditor 核心...";
         }
-        
+
         setLoading(true);
 
-        // A. 微切片策略 (Micro-Slicing)
-        // 800字符一片，确保 Vercel 10s 不超时，且 AI 能穷尽检查
-        const CHUNK_SIZE = 800;
-        // 100字符重叠，防止逻辑在切口处断裂
-        const OVERLAP = 100;
-        
+        // A. 切片策略 (1000字符/卷)
+        const CHUNK_SIZE = 1000;
         const chunks = [];
-        for (let i = 0; i < textToProcess.length; i += (CHUNK_SIZE - OVERLAP)) {
-            let end = Math.min(i + CHUNK_SIZE, textToProcess.length);
-            chunks.push(textToProcess.substring(i, end));
-            // 避免最后一片只有 overlap
-            if (end >= textToProcess.length) break;
+        for (let i = 0; i < textToProcess.length; i += CHUNK_SIZE) {
+            chunks.push(textToProcess.substring(i, i + CHUNK_SIZE));
         }
-
         const totalChunks = chunks.length;
-        el.statusText.innerHTML = `检测到 ${textToProcess.length} 字<br>已拆分为 ${totalChunks} 个逻辑微卷，正在进行饱和式审计...`;
 
-        // B. 结果容器
+        el.statusText.innerHTML = `📚 检测到 ${textToProcess.length} 字符<br>智能拆解为 ${totalChunks} 个逻辑分卷并行分析...`;
+
         let mergedRevisedText = "";
         let allCritiques = [];
         let totalScore = 0;
-        let successCount = 0; // 记录有效的评分次数
 
         try {
-            // C. 串行处理 (Series Processing)
+            // B. 串行处理 (Map-Reduce)
             for (let i = 0; i < totalChunks; i++) {
                 const progress = Math.round(((i) / totalChunks) * 100);
-                el.btnText.textContent = `深度审计中 ${progress}%`;
-                el.statusText.innerHTML = `⚙️ 正在审计第 ${i+1}/${totalChunks} 卷...<br>调用规则库比对逻辑漏洞...`;
+                el.btnText.textContent = `处理中 ${progress}%`;
+                el.statusText.innerHTML = `⚙️ 正在分析第 ${i+1}/${totalChunks} 卷 (包含多格式源)...<br>提取商业/学术逻辑特征...`;
 
                 const chunk = chunks[i];
-                
                 const response = await fetch('/api/check', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -145,66 +204,49 @@ document.addEventListener('DOMContentLoaded', () => {
                     })
                 });
                 
-                if (!response.ok) throw new Error("Network Error");
+                if (!response.ok) throw new Error("API连接失败");
                 const result = await response.json();
 
-                // D. 结果聚合
-                
-                // 1. 分数聚合 (忽略出错的 0 分)
-                if (result.score > 0) {
-                    totalScore += result.score;
-                    successCount++;
-                }
-
-                // 2. 批判项聚合 & 去重
-                if (result.critiques && Array.isArray(result.critiques)) {
-                    result.critiques.forEach(newC => {
-                        // 前端抗噪：过滤掉极短的引用 (如 OCR 残留的页码 '12' 或 '图1')
-                        if (!newC.quote || newC.quote.length < 4) return;
-                        
-                        // 智能去重
-                        if (!isDuplicateCritique(newC, allCritiques)) {
-                            allCritiques.push(newC);
-                        }
-                    });
-                }
-                
-                // 3. 文本聚合
-                // 直接拼接重构文 (Overlap 部分为了展示流畅性暂不做复杂去重，直接追加)
+                if (result.critiques) allCritiques = [...allCritiques, ...result.critiques];
                 mergedRevisedText += (result.revised_text || chunk) + "\n\n";
+                totalScore += (result.score || 0);
             }
 
-            // E. 计算最终结果
-            const finalScore = successCount > 0 ? Math.round(totalScore / successCount) : 0;
+            // C. 汇总结果
+            const finalScore = Math.round(totalScore / (totalChunks || 1));
             
-            // 简单的场景判定用于展示
-            const simpleScene = textToProcess.includes("商业") ? "商业计划书" : "学术/通用文档";
+            // 场景检测关键词扩展 (包含word常见内容)
+            const scenario = detectScenario(textToProcess);
 
             renderDashboard({
-                scene: simpleScene,
+                scene: scenario,
                 score: finalScore,
                 critiques: allCritiques,
                 revised_text: mergedRevisedText,
-                logic_thought_trace: `✅ 全文档深度扫描完成。共执行 ${totalChunks} 次微切片审计，精准检出 ${allCritiques.length} 处关键逻辑风险。`
+                logic_thought_trace: `✅ 多源文档(${totalChunks}卷)深度融合扫描完成，发现 ${allCritiques.length} 处逻辑断层。`
             });
             
-            renderDetails({
-                critiques: allCritiques,
-                revised_text: mergedRevisedText
-            });
+            renderDetails({ critiques: allCritiques, revised_text: mergedRevisedText });
 
+            // 恢复按钮状态
             el.btn.disabled = false;
-            el.btnText.textContent = "开始新一轮审计";
+            el.btnText.textContent = "开始新一轮分析";
             el.loader.style.display = 'none';
 
         } catch (error) {
             console.error(error);
-            alert("审计中断：请检查网络连接或Token配额。已处理部分将不显示。");
+            alert("分析过程中断，请重试");
             setLoading(false, true);
         }
     });
 
-    // 辅助函数
+    // 辅助函数：简单的关键词场景探测
+    function detectScenario(t) {
+        if(t.includes("股权") || t.includes("盈利") || t.includes("商业模式")) return "商业计划书";
+        if(t.includes("参考文献") || t.includes("摘要") || t.includes("实证")) return "学术论文";
+        return "通用文稿";
+    }
+
     function setLoading(isLoading, isError) {
         if (isLoading) {
             el.btn.disabled = true;
@@ -214,9 +256,9 @@ document.addEventListener('DOMContentLoaded', () => {
             el.detailsSection.style.display = 'none';
         } else {
             el.btn.disabled = false;
-            el.btnText.textContent = '开始逻辑修正';
+            el.btnText.textContent = '开始逻辑审计';
             el.loader.style.display = 'none';
-            if (isError) el.statusText.innerHTML = "❌ 中断";
+            if (isError) el.statusText.innerHTML = "❌ 网络超时，请减少字数";
         }
     }
 
@@ -224,48 +266,51 @@ document.addEventListener('DOMContentLoaded', () => {
         el.statusState.style.display = 'none';
         el.resultState.style.display = 'flex';
         el.detailsSection.style.display = 'block';
+        
         el.sceneResult.textContent = data.scene;
         el.issueCount.textContent = data.critiques.length;
         if(el.thoughtTrace) el.thoughtTrace.textContent = data.logic_thought_trace;
+        
         el.scoreText.textContent = data.score;
-        // 动画延迟
+        // 触发圆环动画
         setTimeout(() => el.scoreCircle.setAttribute('stroke-dasharray', `${data.score}, 100`), 100);
     }
 
     function renderDetails(data) {
         el.critiquesList.innerHTML = '';
-        data.critiques.forEach((item, index) => {
-            const li = document.createElement('li');
-            li.className = `critique-item item-color-${(index % 4) + 1}`;
-            
-            li.innerHTML = `
-                <div class="c-header">
-                    <span class="c-index">#${index + 1}</span>
-                    <span class="c-title">${item.issue}</span>
-                </div>
-                
-                <div class="c-body">
-                    ${item.rule_ref ? `<div class="c-rule">⚖️ ${item.rule_ref}</div>` : ''}
-                    <div class="c-quote">“${item.quote}”</div>
-                    <div class="c-fix-wrapper">
-                        <div class="c-fix-label">💡 修正建议：</div>
-                        <div class="c-fix-content">${item.fix}</div>
+        if(data.critiques.length === 0) {
+             el.critiquesList.innerHTML = '<div style="padding:20px;text-align:center;color:#666">🎉 未发现严重逻辑漏洞</div>';
+        } else {
+            data.critiques.forEach((item, index) => {
+                const li = document.createElement('li');
+                li.className = `critique-item item-color-${(index % 4) + 1}`;
+                li.innerHTML = `
+                    <div class="c-header">
+                        <span class="c-index">#${index + 1}</span>
+                        <span class="c-title">${item.issue}</span>
                     </div>
-                </div>
-                <div class="c-footer">点击展开详情</div>
-            `;
-            
-            li.addEventListener('click', () => li.classList.toggle('expanded'));
-            el.critiquesList.appendChild(li);
-        });
+                    <div class="c-body">
+                        ${item.rule_ref ? `<div class="c-rule">⚖️ ${item.rule_ref}</div>` : ''}
+                        <div class="c-quote">“${item.quote}”</div>
+                        <div class="c-fix-wrapper">
+                            <div class="c-fix-label">💡 修正建议：</div>
+                            <div class="c-fix-content">${item.fix}</div>
+                        </div>
+                    </div>
+                    <div class="c-footer">点击展开详情</div>
+                `;
+                li.addEventListener('click', () => li.classList.toggle('expanded'));
+                el.critiquesList.appendChild(li);
+            });
+        }
         
         if (data.revised_text) {
-            // 处理换行符，使其在 HTML 中正确显示
             el.revisedText.innerHTML = data.revised_text.replace(/\n/g, '<br>');
         }
-        el.tabs[0].click(); // 默认切回第一个 Tab
+        el.tabs[0].click();
     }
     
+    // Tabs
     el.tabs.forEach(tab => {
         tab.addEventListener('click', () => {
             el.tabs.forEach(t => t.classList.remove('active'));
@@ -276,6 +321,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     window.copyText = function() {
-        navigator.clipboard.writeText(document.getElementById('revisedText').innerText).then(() => alert('已复制全文'));
+        navigator.clipboard.writeText(document.getElementById('revisedText').innerText).then(() => alert('已复制'));
     }
 });
