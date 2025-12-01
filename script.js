@@ -1,3 +1,4 @@
+// script.js
 document.addEventListener('DOMContentLoaded', () => {
     let fullPdfText = "";
     
@@ -27,6 +28,23 @@ document.addEventListener('DOMContentLoaded', () => {
         removeFileBtn: document.getElementById('removeFileBtn')
     };
 
+    // --- 辅助函数：智能去重 ---
+    function isDuplicateCritique(newItem, existingList) {
+        return existingList.some(oldItem => {
+            // 1. 如果 issue 标题完全相同，视为重复
+            if (oldItem.issue === newItem.issue) return true;
+            
+            // 2. 如果 rule_ref 相同，且引用原文高度重叠，视为重复
+            if (oldItem.rule_ref === newItem.rule_ref) {
+                const q1 = oldItem.quote.trim();
+                const q2 = newItem.quote.trim();
+                // 检查是否包含关系 (处理切片截断导致的长短不一)
+                if (q1.includes(q2) || q2.includes(q1)) return true;
+            }
+            return false;
+        });
+    }
+
     // 1. PDF 解析逻辑 
     el.pdfInput.addEventListener('change', async (e) => {
         const file = e.target.files[0];
@@ -43,6 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
             for (let i = 1; i <= pdf.numPages; i++) {
                 const page = await pdf.getPage(i);
                 const textContent = await page.getTextContent();
+                // 简单的空格连接，保留一定的原始格式
                 fullPdfText += textContent.items.map(item => item.str).join(' ') + "\n\n";
             }
             
@@ -75,7 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const textToProcess = fullPdfText || el.input.value.trim();
         if (textToProcess.length < 10) return alert("内容太少");
 
-        // 如果这已经是第二次运行，先清空上一次的结果显示，避免视觉混乱
+        // UI 状态重置
         if (el.resultState.style.display === 'flex') {
              el.resultState.style.display = 'none';
              el.statusState.style.display = 'flex';
@@ -84,33 +103,35 @@ document.addEventListener('DOMContentLoaded', () => {
         
         setLoading(true);
 
-        // A. 切片：每 800 字符一片（安全不超时）。
-        // 小切片策略：确保 LLM 聚焦细节，且 Vercel 100% 不会超时
-        const CHUNK_SIZE = 800; 
+        // A. 微切片策略 (Micro-Slicing)
+        // 800字符一片，确保 Vercel 10s 不超时，且 AI 能穷尽检查
+        const CHUNK_SIZE = 800;
+        // 100字符重叠，防止逻辑在切口处断裂
+        const OVERLAP = 100;
+        
         const chunks = [];
-        // 增加 100 字符的重叠 (Overlap)，防止上下文在切口处断裂
-        const OVERLAP = 100; 
-
         for (let i = 0; i < textToProcess.length; i += (CHUNK_SIZE - OVERLAP)) {
             let end = Math.min(i + CHUNK_SIZE, textToProcess.length);
             chunks.push(textToProcess.substring(i, end));
-            // 如果已经到了末尾，跳出循环
-            if (end >= textToProcess.length) break; 
+            // 避免最后一片只有 overlap
+            if (end >= textToProcess.length) break;
         }
 
         const totalChunks = chunks.length;
-        el.statusText.innerHTML = `检测到 ${textToProcess.length} 字<br>已智能拆分为 ${totalChunks} 个逻辑微卷，正在进行饱和式审计...`;
+        el.statusText.innerHTML = `检测到 ${textToProcess.length} 字<br>已拆分为 ${totalChunks} 个逻辑微卷，正在进行饱和式审计...`;
 
+        // B. 结果容器
         let mergedRevisedText = "";
         let allCritiques = [];
         let totalScore = 0;
-        let successCount = 0; // 记录成功返回分数的切片数
+        let successCount = 0; // 记录有效的评分次数
 
         try {
+            // C. 串行处理 (Series Processing)
             for (let i = 0; i < totalChunks; i++) {
                 const progress = Math.round(((i) / totalChunks) * 100);
                 el.btnText.textContent = `深度审计中 ${progress}%`;
-                el.statusText.innerHTML = `⚙️ 正在审计第 ${i+1}/${totalChunks} 卷...<br>调用本地知识库进行全量比对...`;
+                el.statusText.innerHTML = `⚙️ 正在审计第 ${i+1}/${totalChunks} 卷...<br>调用规则库比对逻辑漏洞...`;
 
                 const chunk = chunks[i];
                 
@@ -127,37 +148,44 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (!response.ok) throw new Error("Network Error");
                 const result = await response.json();
 
-                // 只有当有有效评分时才计入平均分（排除出错或空跑的 0 分）
+                // D. 结果聚合
+                
+                // 1. 分数聚合 (忽略出错的 0 分)
                 if (result.score > 0) {
                     totalScore += result.score;
                     successCount++;
                 }
 
-                if (result.critiques) {
-                    // 去重逻辑：防止 overlap 区域产生重复的 critique
-                    // 简单的去重：检查 issue 文本是否完全一致
-                    const newCritiques = result.critiques.filter(newC => 
-                        !allCritiques.some(oldC => oldC.issue === newC.issue)
-                    );
-                    allCritiques = [...allCritiques, ...newCritiques];
+                // 2. 批判项聚合 & 去重
+                if (result.critiques && Array.isArray(result.critiques)) {
+                    result.critiques.forEach(newC => {
+                        // 前端抗噪：过滤掉极短的引用 (如 OCR 残留的页码 '12' 或 '图1')
+                        if (!newC.quote || newC.quote.length < 4) return;
+                        
+                        // 智能去重
+                        if (!isDuplicateCritique(newC, allCritiques)) {
+                            allCritiques.push(newC);
+                        }
+                    });
                 }
                 
-                // 拼接重构文（注意处理 Overlap，这里简化处理，直接拼接可能会有少量重复，
-                // 但为了逻辑修正的完整性，建议后端只返回“修正后的纯文本”，或者前端这里不重叠显示。
-                // 鉴于比赛展示主要是看“漏洞列表”，这里直接拼接 revised_text 即可，
-                // 或者稍微修剪一下开头重叠部分，这里暂保持简单拼接以防丢失内容）
+                // 3. 文本聚合
+                // 直接拼接重构文 (Overlap 部分为了展示流畅性暂不做复杂去重，直接追加)
                 mergedRevisedText += (result.revised_text || chunk) + "\n\n";
             }
 
-            // 计算平均分 (防止除以 0)
+            // E. 计算最终结果
             const finalScore = successCount > 0 ? Math.round(totalScore / successCount) : 0;
+            
+            // 简单的场景判定用于展示
+            const simpleScene = textToProcess.includes("商业") ? "商业计划书" : "学术/通用文档";
 
             renderDashboard({
-                scene: detectScenario(textToProcess),
+                scene: simpleScene,
                 score: finalScore,
                 critiques: allCritiques,
                 revised_text: mergedRevisedText,
-                logic_thought_trace: `✅ 全文档深度扫描完成。共执行 ${totalChunks} 次微切片审计，检出 ${allCritiques.length} 处关键逻辑风险。`
+                logic_thought_trace: `✅ 全文档深度扫描完成。共执行 ${totalChunks} 次微切片审计，精准检出 ${allCritiques.length} 处关键逻辑风险。`
             });
             
             renderDetails({
@@ -171,18 +199,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } catch (error) {
             console.error(error);
-            alert("审计中断：请检查网络或Token余额");
+            alert("审计中断：请检查网络连接或Token配额。已处理部分将不显示。");
             setLoading(false, true);
         }
     });
 
     // 辅助函数
-    function detectScenario(t) {
-        if(t.includes("市场") || t.includes("盈利")) return "商业计划书";
-        if(t.includes("论文") || t.includes("研究")) return "学术论文";
-        return "通用文本";
-    }
-
     function setLoading(isLoading, isError) {
         if (isLoading) {
             el.btn.disabled = true;
@@ -206,57 +228,17 @@ document.addEventListener('DOMContentLoaded', () => {
         el.issueCount.textContent = data.critiques.length;
         if(el.thoughtTrace) el.thoughtTrace.textContent = data.logic_thought_trace;
         el.scoreText.textContent = data.score;
+        // 动画延迟
         setTimeout(() => el.scoreCircle.setAttribute('stroke-dasharray', `${data.score}, 100`), 100);
     }
 
-    // 渲染详情（包含点击展开逻辑）
     function renderDetails(data) {
         el.critiquesList.innerHTML = '';
         data.critiques.forEach((item, index) => {
             const li = document.createElement('li');
             li.className = `critique-item item-color-${(index % 4) + 1}`;
             
-            // 构建HTML结构
             li.innerHTML = `
                 <div class="c-header">
                     <span class="c-index">#${index + 1}</span>
-                    <span class="c-title">${item.issue}</span>
-                </div>
-                
-                <div class="c-body">
-                    ${item.rule_ref ? `<div class="c-rule">⚖️ ${item.rule_ref}</div>` : ''}
-                    <div class="c-quote">“${item.quote}”</div>
-                    <div class="c-fix-wrapper">
-                        <div class="c-fix-label">💡 修正建议：</div>
-                        <div class="c-fix-content">${item.fix}</div>
-                    </div>
-                </div>
-                <div class="c-footer">点击展开详情</div>
-            `;
-            
-            li.addEventListener('click', () => li.classList.toggle('expanded'));
-            el.critiquesList.appendChild(li);
-        });
-        
-        if (data.revised_text) {
-            el.revisedText.innerHTML = data.revised_text.replace(/\n/g, '<br>');
-        }
-        el.tabs[0].click();
-    }
-    
-    // Tab 切换逻辑
-    el.tabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            el.tabs.forEach(t => t.classList.remove('active'));
-            el.tabContents.forEach(c => c.classList.remove('active'));
-            tab.classList.add('active');
-            document.getElementById(`tab-${tab.dataset.tab}`).classList.add('active');
-        });
-    });
-
-    window.copyText = function() {
-        navigator.clipboard.writeText(document.getElementById('revisedText').innerText).then(() => alert('已复制'));
-    }
-});
-
-
+                    <span
