@@ -241,4 +241,41 @@ document.addEventListener('DOMContentLoaded', () => {
             li.innerHTML = `
                 <div class="c-header">
                     <span class="c-index">#${index + 1}</span>
-                    <span
+                    <span class="c-title">${item.issue}</span>
+                </div>
+                
+                <div class="c-body">
+                    ${item.rule_ref ? `<div class="c-rule">⚖️ ${item.rule_ref}</div>` : ''}
+                    <div class="c-quote">“${item.quote}”</div>
+                    <div class="c-fix-wrapper">
+                        <div class="c-fix-label">💡 修正建议：</div>
+                        <div class="c-fix-content">${item.fix}</div>
+                    </div>
+                </div>
+                <div class="c-footer">点击展开详情</div>
+            `;
+            
+            li.addEventListener('click', () => li.classList.toggle('expanded'));
+            el.critiquesList.appendChild(li);
+        });
+        
+        if (data.revised_text) {
+            // 处理换行符，使其在 HTML 中正确显示
+            el.revisedText.innerHTML = data.revised_text.replace(/\n/g, '<br>');
+        }
+        el.tabs[0].click(); // 默认切回第一个 Tab
+    }
+    
+    el.tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            el.tabs.forEach(t => t.classList.remove('active'));
+            el.tabContents.forEach(c => c.classList.remove('active'));
+            tab.classList.add('active');
+            document.getElementById(`tab-${tab.dataset.tab}`).classList.add('active');
+        });
+    });
+
+    window.copyText = function() {
+        navigator.clipboard.writeText(document.getElementById('revisedText').innerText).then(() => alert('已复制全文'));
+    }
+});
