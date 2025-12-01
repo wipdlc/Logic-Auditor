@@ -75,6 +75,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const textToProcess = fullPdfText || el.input.value.trim();
         if (textToProcess.length < 10) return alert("内容太少");
 
+        // 如果这已经是第二次运行，先清空上一次的结果显示，避免视觉混乱
+        if (el.resultState.style.display === 'flex') {
+             el.resultState.style.display = 'none';
+             el.statusState.style.display = 'flex';
+             el.statusText.innerHTML = "♻️ 正在初始化 Logic Auditor 核心...";
+        }
+        
         setLoading(true);
 
         // A. 切片：每 2500 字符一片（安全不超时）
@@ -140,6 +147,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 critiques: allCritiques,
                 revised_text: mergedRevisedText
             });
+
+            // 流程结束后，释放按钮，允许下一次操作
+            el.btn.disabled = false;
+            el.btnText.textContent = "开始新一轮审计"; // 变成重试文案
+            el.loader.style.display = 'none';
+            
 
         } catch (error) {
             console.error(error);
@@ -230,3 +243,4 @@ document.addEventListener('DOMContentLoaded', () => {
         navigator.clipboard.writeText(document.getElementById('revisedText').innerText).then(() => alert('已复制'));
     }
 });
+
