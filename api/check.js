@@ -1,63 +1,66 @@
 // api/check.js
 import { KNOWLEDGE_BASE, detectScenario } from './knowledge_base.js';
 
+export const config = {
+    maxDuration: 60, // 尝试申请 Vercel 的最长执行时间 
+};
+
 export default async function handler(req, res) {
     if (req.method !== 'POST') return res.status(405).json({ error: 'Method Not Allowed' });
 
     try {
-        // 1. 解析请求体
         let parsedBody;
         try {
             parsedBody = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
         } catch (e) {
-            throw new Error('Invalid request body format');
+            throw new Error('Invalid JSON Body');
         }
 
         const { text } = parsedBody;
-        if (!text || typeof text !== 'string' || text.length < 5) {
-            return res.status(400).json({ error: 'Text content is too short or invalid.' });
+        
+        // 这里的 Text 已经被前端截断过了，是安全的长度
+        if (!text || text.length < 5) {
+            return res.status(400).json({ error: 'Text too short' });
         }
 
         const apiKey = process.env.QWEN_API_KEY; 
         const url = 'https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation';
 
-        // 2. RAG 语义路由：动态挂载知识库
-        // 这是答辩时可以重点讲的：“我们不是盲目生成，而是基于场景动态路由规则”
         const scenarioKey = detectScenario(text);
-        const scenarioName = scenarioKey === 'academic' ? '学术论文/答辩' : (scenarioKey === 'business' ? '商业计划书' : '通用逻辑陈述');
+        const scenarioName = scenarioKey === 'academic' ? '学术论文/答辩' : (scenarioKey === 'business' ? '商业计划书' : '通用文本');
         const rules = KNOWLEDGE_BASE[scenarioKey];
 
-        // 3. 构建高阶思维链 Prompt (Chain of Thought)
-        const systemPrompt = `你是一个基于权威规则库构建的逻辑审计系统 (Logic Auditor)。
-当前检测到的场景为：【${scenarioName}】。
+        // 🔥 PROMPT 升级：要求更激进的修改
+        const systemPrompt = `你是一个严苛的【逻辑审计与重构专家】。
+当前审计模式：【${scenarioName}】。
 
-你必须严格依据以下【核心校验标准】进行审计，严禁脱离标准自由发挥：
-========== 核心校验标准 START ==========
+⚠️ 必须依据以下标准进行高强度审查：
 ${rules}
-========== 核心校验标准 END ==========
 
-你的任务流程（Chain of Thought）：
-1. **对照审查**：逐句阅读用户文本，比对【核心校验标准】。
-2. **规则引用**：当你指出漏洞时，**必须明确引用**它是标准中的第几条。例如："违反标准第1条：缺乏数据支撑"。
-3. **防御性重构**：重写文本。要求消除所有逻辑谬误，补充[此处需补充XX数据]占位符，保持专业语调。
+### 你的任务 (Think Step-by-Step):
+1. **漏洞狙击**：在文本中找出逻辑最脆弱的 2-46个点。不要挑剔错别字，只攻击逻辑漏洞（如数据缺失、闭环断裂）。
+2. **强制引用**：指出的每个漏洞，必须明确写出"依据 [标准名] 第X条"。
+3. **深度重构 (Deep Rewrite)**：
+   - 不要只修修补补！**请重写整段话**，使其达到答辩金奖/顶刊论文的水准。
+   - **数据补全**：遇到空洞的地方，使用[建议补充2024年Q3市场份额数据]这种具体格式的占位符。
+   - **高亮修改**：对重构中你增强逻辑的关键句子，必须用 <b>...</b> 包裹。
 
-请严格以纯 JSON 格式输出，不要包含 markdown 代码块标记，格式如下：
+### 输出格式 (JSON):
 {
     "scene": "${scenarioName}",
-    "score": 0-100之间的整数,
-    "logic_thought_trace": "一句话总结你发现了什么核心问题（例如：‘主要检测到商业闭环逻辑缺失，违背标准第2条’）",
+    "score": 0-100的整数,
+    "logic_thought_trace": "一句话总结本文最大的逻辑硬伤",
     "critiques": [
         {
-            "quote": "原文具体片段",
+            "quote": "原文片段",
             "issue": "问题描述",
-            "rule_ref": "违背标准的具体引用 (如: 依据标准第1条)",
+            "rule_ref": "依据的标准 (必须包含标准具体名称)",
             "fix": "具体修改建议"
         }
     ],
-    "revised_text": "重写后的文本，关键修改处必须用 <b>...</b> 标签包裹以高亮显示"
+    "revised_text": "深度重构后的完整文本，关键处用<b>标签包裹"
 }`;
 
-        // 4. 调用阿里 Qwen API
         const response = await fetch(url, {
             method: 'POST',
             headers: {
@@ -69,12 +72,12 @@ ${rules}
                 input: {
                     messages: [
                         { role: 'system', content: systemPrompt },
-                        { role: 'user', content: text },
+                        { role: 'user', content: text }, // 此时的 text 是前端传来的精华片段
                     ],
                 },
                 parameters: { 
                     result_format: 'message',
-                    temperature: 0.1, // 低温，确保严谨
+                    temperature: 0.2, // 温度设置
                     top_p: 0.8
                 },
             }),
@@ -82,22 +85,23 @@ ${rules}
 
         if (!response.ok) {
             const err = await response.json();
-            throw new Error(`API Provider Error: ${JSON.stringify(err)}`);
+            throw new Error(JSON.stringify(err));
         }
         
         const data = await response.json();
-        if (data.code) throw new Error(`Qwen Logic Error: ${data.message}`);
-
         const rawContent = data.output.choices[0].message.content;
-        
-        // 5. 鲁棒性清洗 JSON
         const jsonStr = rawContent.replace(/```json|```/g, '').trim();
-        const result = JSON.parse(jsonStr);
-
-        return res.status(200).json(result);
+        
+        try {
+            const result = JSON.parse(jsonStr);
+            return res.status(200).json(result);
+        } catch (e) {
+            // 如果 JSON 解析失败，说明可能被截断了，或者输出格式不对
+            throw new Error("模型输出格式异常，请缩短文本重试");
+        }
 
     } catch (error) {
-        console.error('[Logic Auditor Backend Error]', error);
-        return res.status(500).json({ error: error.message || 'Internal Server Error' });
+        console.error('[Backend Error]', error);
+        return res.status(500).json({ error: error.message });
     }
 }
