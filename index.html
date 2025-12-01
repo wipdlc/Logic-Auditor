@@ -7,11 +7,14 @@
     <!-- 引入样式 -->
     <link rel="stylesheet" href="style.css">
     
-    <!-- 引入 PDF.js -->
+    <!-- 1. 引入 PDF.js (用于解析 PDF) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
     </script>
+
+    <!-- 2. 引入 Mammoth.js (用于解析 Word .docx) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -31,29 +34,31 @@
                 <!-- 左侧：输入与上传 -->
                 <section class="panel input-panel">
                     <div class="panel-header">
-                        <h2>📝 修正对象</h2>
+                        <h2>📝 分析对象</h2>
                         <div class="file-upload-wrapper">
-                            <!-- 隐藏的文件输入框 -->
-                            <input type="file" id="pdfUpload" accept="application/pdf" style="display: none;" />
-                            <button class="upload-btn" onclick="document.getElementById('pdfUpload').click()">
-                                📂 导入 PDF / BP
+                            <!-- 核心修改：支持多文件 multiple，支持多种格式 -->
+                            <input type="file" id="genericFileUpload" accept=".pdf,.docx,.txt" multiple style="display: none;" />
+                            
+                            <button class="upload-btn" onclick="document.getElementById('genericFileUpload').click()">
+                                📂 导入文件
                             </button>
                         </div>
                     </div>
 
                     <!-- 输入区域容器 -->
                     <div class="input-area-wrapper">
-                        <textarea id="inputText" placeholder="请粘贴文本，或点击上方按钮上传 PDF 文件..."></textarea>
+                        <!-- 默认显示的文本框 -->
+                        <textarea id="inputText" placeholder="请粘贴文本，或点击上方按钮上传 PDF / Word / TXT 文件...&#10;支持单次上传最多 3 个文件进行合并分析。"></textarea>
                         
-                        <!-- 文件预览卡片 (JS控制显示) -->
+                        <!-- 文件解析后的预览卡片 (JS控制显示) -->
                         <div id="filePreviewArea" style="display: none;">
                             <div class="file-card">
-                                <div class="file-icon">📄</div>
+                                <div class="file-icon">📑</div>
                                 <div class="file-info">
-                                    <span class="file-name" id="fileNameDisplay">文件名.pdf</span>
-                                    <span class="file-status">已解析完毕 · 等待修正</span>
+                                    <span class="file-name" id="fileNameDisplay">文件名占位符</span>
+                                    <span class="file-status">已解析完毕 · 等待分析</span>
                                 </div>
-                                <button id="removeFileBtn" title="移除文件">✕</button>
+                                <button id="removeFileBtn" title="移除所有文件">✕</button>
                             </div>
                         </div>
                     </div>
@@ -73,11 +78,13 @@
                         <h2>📊 修正概览</h2>
                     </div>
                     
+                    <!-- 初始状态：居中显示 -->
                     <div id="statusState" class="dashboard-content center-mode">
                         <div class="pulse-icon">🧬</div>
                         <p id="statusText">Logic Auditor就绪<br>请导入内容</p>
                     </div>
 
+                    <!-- 结果状态：垂直分布 -->
                     <div id="resultState" class="dashboard-content result-mode" style="display: none;">
                         <div class="score-container">
                             <svg viewBox="0 0 36 36" class="circular-chart">
@@ -85,15 +92,15 @@
                                 <path class="circle" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                                 <text x="18" y="20.35" class="percentage">0</text>
                             </svg>
-                            <span class="label">逻辑分</span>
+                            <span class="label">逻辑评分</span>
                         </div>
                         <div class="meta-info">
                             <div class="meta-item">
-                                <span class="label">场景</span>
+                                <span class="label">场景模式</span>
                                 <strong id="sceneResult">--</strong>
                             </div>
                             <div class="meta-item">
-                                <span class="label">漏洞</span>
+                                <span class="label">发现漏洞</span>
                                 <strong id="issueCount">0</strong>
                             </div>
                         </div>
@@ -105,7 +112,7 @@
                 </section>
             </div>
 
-            <!-- 底部详情 -->
+            <!-- 底部详情：Tab分页 -->
             <div class="bottom-wrapper" id="detailsSection" style="display: none;">
                 <section class="panel details-panel">
                     <div class="tabs">
@@ -126,6 +133,7 @@
         </main>
     </div>
     
+    <!-- 引入核心逻辑 -->
     <script src="script.js"></script>
 </body>
 </html>
