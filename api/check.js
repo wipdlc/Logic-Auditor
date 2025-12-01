@@ -1,10 +1,6 @@
 // api/check.js
 import { KNOWLEDGE_BASE, detectScenario } from './knowledge_base.js';
 
-// 申请 Vercel 最大执行时间 
-    maxDuration: 60, 
-};
-
 export default async function handler(req, res) {
     // 1. 允许 CORS 跨域 (解决很多网络中断的玄学问题)
     res.setHeader('Access-Control-Allow-Credentials', true);
@@ -209,4 +205,5 @@ function extractByRegex(brokenJson, originalText) {
         revised_text: revisedText + "..." // 加上省略号示意截断
     };
 }
+
 
