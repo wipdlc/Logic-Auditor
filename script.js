@@ -1,8 +1,7 @@
-// script.js
 document.addEventListener('DOMContentLoaded', () => {
-    // 状态变量：存储完整的 PDF 文本，但不显示在输入框里
     let fullPdfText = "";
     
+    // DOM 元素获取 
     const el = {
         input: document.getElementById('inputText'),
         btn: document.getElementById('submitBtn'),
@@ -23,142 +22,201 @@ document.addEventListener('DOMContentLoaded', () => {
         tabs: document.querySelectorAll('.tab-btn'),
         tabContents: document.querySelectorAll('.tab-content'),
         pdfInput: document.getElementById('pdfUpload'),
-        
-        // 新增：文件预览卡片区域
         filePreviewArea: document.getElementById('filePreviewArea'),
         fileNameDisplay: document.getElementById('fileNameDisplay'),
         removeFileBtn: document.getElementById('removeFileBtn')
     };
 
-    // --- 1. PDF 解析逻辑  ---
+    // 1. PDF 解析逻辑 
     el.pdfInput.addEventListener('change', async (e) => {
         const file = e.target.files[0];
         if (!file) return;
+        if (file.type !== 'application/pdf') { alert('仅支持 PDF'); return; }
 
-        if (file.type !== 'application/pdf') {
-            alert('仅支持 PDF 文件');
-            return;
-        }
-
-        // 显示 Loading 状态
-        el.charCount.textContent = "正在深度解析 PDF 结构...";
-        el.input.disabled = true; // 暂时禁用输入框
-        el.input.classList.add('scanning'); // 添加扫描动画效果
-
+        el.input.disabled = true;
+        el.charCount.textContent = "解析 PDF 结构中...";
+        
         try {
             const arrayBuffer = await file.arrayBuffer();
             const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
-            const maxPages = pdf.numPages;
-            
-            fullPdfText = ""; // 清空旧数据
-
-            for (let i = 1; i <= maxPages; i++) {
+            fullPdfText = "";
+            for (let i = 1; i <= pdf.numPages; i++) {
                 const page = await pdf.getPage(i);
                 const textContent = await page.getTextContent();
-                const pageText = textContent.items.map(item => item.str).join(' ');
-                fullPdfText += `[P${i}] ` + pageText + "\n\n";
+                fullPdfText += textContent.items.map(item => item.str).join(' ') + "\n\n";
             }
             
-            // 解析成功：
-            // 1. 不把文字塞进 textarea，而是显示文件卡片
-            el.input.style.display = 'none'; // 隐藏输入框
-            el.filePreviewArea.style.display = 'flex'; // 显示文件卡片
+            el.input.style.display = 'none';
+            el.filePreviewArea.style.display = 'flex';
             el.fileNameDisplay.textContent = file.name;
-            
-            // 2. 更新状态
-            el.charCount.textContent = `✅ 已就绪 | 全文共 ${maxPages} 页 (${fullPdfText.length} 字符)`;
+            el.charCount.textContent = `✅ 共 ${pdf.numPages} 页 (${fullPdfText.length} 字符)`;
             el.charCount.style.color = '#10b981';
-            el.input.disabled = false;
-            el.input.classList.remove('scanning');
-            
-            // 清空 value 避免干扰，逻辑只走 fullPdfText
             el.input.value = ""; 
-
-        } catch (error) {
-            console.error(error);
-            alert("PDF 解析失败，请重试");
+        } catch (err) {
+            console.error(err);
+            alert("PDF 解析失败");
             resetInput();
+        } finally {
+            el.input.disabled = false;
         }
     });
 
-    // 移除文件逻辑
-    el.removeFileBtn.addEventListener('click', () => {
-        resetInput();
-    });
-
+    el.removeFileBtn.addEventListener('click', resetInput);
     function resetInput() {
         fullPdfText = "";
         el.input.value = "";
-        el.pdfInput.value = ""; // 清空 input file
         el.input.style.display = 'block';
         el.filePreviewArea.style.display = 'none';
         el.charCount.textContent = "Ready";
-        el.charCount.style.color = "#9ca3af";
-        el.input.disabled = false;
-        el.input.classList.remove('scanning');
     }
 
-    // --- 2. 提交逻辑 (核心：解决超时问题) ---
+    // 🔥 2. 核心分片处理逻辑
     el.btn.addEventListener('click', async () => {
-        // 判断是取 PDF 变量还是取输入框文本
-        let textToSend = fullPdfText || el.input.value.trim();
-        
-        if (textToSend.length < 5) {
-            alert('请输入内容或上传文件。');
-            return;
-        }
-
-        // 🛑 核心截断逻辑：Vercel Hobby 10s 只能处理约 4000-5000 字符 (约1000 tokens)
-        // 超过这个长度，99% 会超时报错。保留摘要和核心逻辑足以发现漏洞。
-        const MAX_CHARS = 4500; 
-        if (textToSend.length > MAX_CHARS) {
-            console.log(`文本过长 (${textToSend.length})，进行智能截断至 ${MAX_CHARS}，防止超时`);
-            textToSend = textToSend.substring(0, MAX_CHARS) + "\n\n[...此处省略后续内容，基于前文核心逻辑进行审计...]";
-        }
+        const textToProcess = fullPdfText || el.input.value.trim();
+        if (textToProcess.length < 10) return alert("内容太少");
 
         setLoading(true);
-        const animationPromise = simulateThinkingProcess();
+
+        // A. 切片：每 2500 字符一片（安全不超时）
+        const CHUNK_SIZE = 2500;
+        const chunks = [];
+        for (let i = 0; i < textToProcess.length; i += CHUNK_SIZE) {
+            chunks.push(textToProcess.substring(i, i + CHUNK_SIZE));
+        }
+
+        const totalChunks = chunks.length;
+        el.statusText.innerHTML = `检测到 ${textToProcess.length} 字<br>已智能拆分为 ${totalChunks} 个逻辑分卷处理...`;
+
+        // B. 结果容器
+        let mergedRevisedText = "";
+        let allCritiques = [];
+        let totalScore = 0;
 
         try {
-            const response = await fetch('/api/check', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ text: textToSend })
-            });
-            
-            // 如果返回的不是 JSON (比如 Vercel 504 Timeout HTML页)，这里会报错
-            const contentType = response.headers.get("content-type");
-            if (!contentType || !contentType.includes("application/json")) {
-                throw new Error("Network Timeout (Analysis took too long)");
+            // C. 串行处理每一片 (避免并发把服务器打挂)
+            for (let i = 0; i < totalChunks; i++) {
+                // 更新进度 UI
+                const progress = Math.round(((i) / totalChunks) * 100);
+                el.btnText.textContent = `处理进度 ${progress}%`;
+                el.statusText.innerHTML = `⚙️ 正在深度分析第 ${i+1}/${totalChunks} 卷...<br>调用知识库校验逻辑闭环...`;
+
+                const chunk = chunks[i];
+                
+                // 发送请求
+                const response = await fetch('/api/check', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        text: chunk, 
+                        chunkIndex: i, 
+                        totalChunks: totalChunks 
+                    })
+                });
+                
+                if (!response.ok) throw new Error("Network Error");
+                const result = await response.json();
+
+                // D. 聚合结果
+                if (result.critiques) allCritiques = [...allCritiques, ...result.critiques];
+                // 拼接重构文（加换行）
+                mergedRevisedText += (result.revised_text || chunk) + "\n\n";
+                // 累加分数
+                totalScore += (result.score || 0);
             }
 
-            const data = await response.json();
-            if (!response.ok) throw new Error(data.error || 'API Error');
+            // E. 计算最终平均分
+            const finalScore = Math.round(totalScore / totalChunks);
 
-            await animationPromise; // 保证动画流畅
-            renderDashboard(data);
-            renderDetails(data);
+            // F. 渲染最终大结果
+            renderDashboard({
+                scene: detectScenario(textToProcess),
+                score: finalScore,
+                critiques: allCritiques,
+                revised_text: mergedRevisedText,
+                logic_thought_trace: `✅ 已完成全文档 ${totalChunks} 卷深度扫描，共检出 ${allCritiques.length} 处逻辑断层。`
+            });
+            
+            renderDetails({
+                critiques: allCritiques,
+                revised_text: mergedRevisedText
+            });
 
         } catch (error) {
             console.error(error);
-            // 友好的错误提示
-            let msg = error.message;
-            if (msg.includes("Timeout") || msg.includes("token")) {
-                msg = "⚠️ 文本过长导致分析超时。\nLogic Auditor 已启用截断模式，请重试。";
-            }
-            alert(`审计中断: ${msg}`);
-            setLoading(false, true); 
+            alert("审计中断：请检查网络连接");
+            setLoading(false, true);
         }
     });
 
-    // --- 其他辅助函数 ---
-    el.input.addEventListener('input', () => {
-        if (!fullPdfText) {
-            const len = el.input.value.length;
-            el.charCount.textContent = len > 0 ? `当前字数：${len}` : 'Waiting...';
-        }
-    });
+    // 辅助函数
+    function detectScenario(t) {
+        if(t.includes("市场") || t.includes("盈利")) return "商业计划书";
+        if(t.includes("论文") || t.includes("研究")) return "学术论文";
+        return "通用文本";
+    }
 
+    function setLoading(isLoading, isError) {
+        if (isLoading) {
+            el.btn.disabled = true;
+            el.loader.style.display = 'block';
+            el.resultState.style.display = 'none';
+            el.statusState.style.display = 'flex';
+            el.detailsSection.style.display = 'none';
+        } else {
+            el.btn.disabled = false;
+            el.btnText.textContent = '开始逻辑修正';
+            el.loader.style.display = 'none';
+            if (isError) el.statusText.innerHTML = "❌ 中断";
+        }
+    }
+
+    function renderDashboard(data) {
+        el.statusState.style.display = 'none';
+        el.resultState.style.display = 'flex';
+        el.detailsSection.style.display = 'block';
+        el.sceneResult.textContent = data.scene;
+        el.issueCount.textContent = data.critiques.length;
+        if(el.thoughtTrace) el.thoughtTrace.textContent = data.logic_thought_trace;
+        el.scoreText.textContent = data.score;
+        setTimeout(() => el.scoreCircle.setAttribute('stroke-dasharray', `${data.score}, 100`), 100);
+    }
+
+    // 渲染详情（包含点击展开逻辑）
+    function renderDetails(data) {
+        el.critiquesList.innerHTML = '';
+        data.critiques.forEach((item, index) => {
+            const li = document.createElement('li');
+            li.className = `critique-item item-color-${(index % 4) + 1}`;
+            
+            // 构建HTML结构
+            li.innerHTML = `
+                <div class="c-header">
+                    <span class="c-index">#${index + 1}</span>
+                    <span class="c-title">${item.issue}</span>
+                </div>
+                
+                <div class="c-body">
+                    ${item.rule_ref ? `<div class="c-rule">⚖️ ${item.rule_ref}</div>` : ''}
+                    <div class="c-quote">“${item.quote}”</div>
+                    <div class="c-fix-wrapper">
+                        <div class="c-fix-label">💡 修正建议：</div>
+                        <div class="c-fix-content">${item.fix}</div>
+                    </div>
+                </div>
+                <div class="c-footer">点击展开详情</div>
+            `;
+            
+            li.addEventListener('click', () => li.classList.toggle('expanded'));
+            el.critiquesList.appendChild(li);
+        });
+        
+        if (data.revised_text) {
+            el.revisedText.innerHTML = data.revised_text.replace(/\n/g, '<br>');
+        }
+        el.tabs[0].click();
+    }
+    
+    // Tab 切换逻辑
     el.tabs.forEach(tab => {
         tab.addEventListener('click', () => {
             el.tabs.forEach(t => t.classList.remove('active'));
@@ -168,98 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    async function simulateThinkingProcess() {
-        const steps = [
-            "🔍 读取核心文本摘要 (Top 4k tokens)...", // 暗示截断是特性而非Bug
-            "🧠 识别场景: 正在匹配 [标准:GB/T 7713]...",
-            "⚖️ 正在调用 Logic Auditor 逻辑对抗网络...",
-            "⚔️ 发现逻辑断层，正在强制引用规则...",
-            "🛡️ 正在进行学术级/商业级深度重构..."
-        ];
-        for (let i = 0; i < steps.length; i++) {
-            if (!el.btn.disabled) break;
-            el.statusText.innerHTML = steps[i];
-            await new Promise(r => setTimeout(r, 1500));
-        }
-    }
-
-    function setLoading(isLoading, isError = false) {
-        if (isLoading) {
-            el.btn.disabled = true;
-            el.btnText.textContent = '专家审计中...';
-            el.loader.style.display = 'block';
-            el.resultState.style.display = 'none';
-            el.statusState.style.display = 'flex';
-            el.detailsSection.style.display = 'none';
-        } else {
-            el.btn.disabled = false;
-            el.btnText.textContent = '开始逻辑修正';
-            el.loader.style.display = 'none';
-            if (isError) el.statusText.innerHTML = "❌ 连接中断<br>请检查网络";
-        }
-    }
-
-    function renderDashboard(data) {
-        el.statusState.style.display = 'none';
-        el.resultState.style.display = 'flex';
-        el.detailsSection.style.display = 'block';
-        el.sceneResult.textContent = data.scene || '通用';
-        el.issueCount.textContent = data.critiques ? data.critiques.length : 0;
-        if(el.thoughtTrace) el.thoughtTrace.textContent = data.logic_thought_trace || "深度扫描完成";
-        
-        const score = data.score || 0;
-        el.scoreText.textContent = score;
-        setTimeout(() => {
-            el.scoreCircle.setAttribute('stroke-dasharray', `${score}, 100`);
-            let color = '#ef4444';
-            if(score >= 60) color = '#f59e0b';
-            if(score >= 80) color = '#10b981';
-            el.scoreCircle.style.stroke = color;
-        }, 100);
-    }
-
-    function renderDetails(data) {
-        el.critiquesList.innerHTML = '';
-        if (data.critiques && data.critiques.length > 0) {
-            data.critiques.forEach((item, index) => {
-                const li = document.createElement('li');
-                li.className = `critique-item item-color-${(index % 4) + 1}`; // 强制添加颜色类
-
-                const ruleTag = item.rule_ref 
-                    ? `<div class="rule-ref">📖 ${item.rule_ref}</div>` 
-                    : '';
-
-                li.innerHTML = `
-                    <div class="q-issue">
-                        <span>⚠️ 漏洞 ${index + 1}</span>
-                        ${item.issue}
-                    </div>
-                    ${ruleTag}
-                    <div class="q-quote">“${item.quote}”</div>
-                    <div class="q-fix">
-                        <strong>💡 修正方案：</strong>
-                        <p>${item.fix}</p>
-                    </div>
-                    <div class="expand-hint">点击展开/收起详情</div>
-                `;
-                li.addEventListener('click', () => {
-                    li.classList.toggle('expanded');
-                });
-                el.critiquesList.appendChild(li);
-            });
-        } else {
-            el.critiquesList.innerHTML = '<li style="padding:20px;">🎉 未发现明显漏洞。</li>';
-        }
-
-        if (data.revised_text) {
-            el.revisedText.innerHTML = data.revised_text.replace(/\n/g, '<br>');
-        }
-        el.tabs[0].click();
+    window.copyText = function() {
+        navigator.clipboard.writeText(document.getElementById('revisedText').innerText).then(() => alert('已复制'));
     }
 });
-
-// 全局函数
-window.copyText = function() {
-    const text = document.getElementById('revisedText').innerText;
-    navigator.clipboard.writeText(text).then(() => alert('已复制'));
-}
