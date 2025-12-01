@@ -1,5 +1,5 @@
 
-import rulesData from './data/rules.json' assert { type: 'json' };
+import rulesData from './data/rules.json' with { type: 'json' };
 
 
 export const detectScenario = (text) => {
@@ -72,4 +72,5 @@ export const retrieveRules = (text, scenario) => {
         `> [${r.display_source}]\n  条款内容：${r.content}`
     ).join('\n\n');
 };
+
 
