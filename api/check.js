@@ -1,8 +1,7 @@
 // api/check.js
 import { KNOWLEDGE_BASE, detectScenario } from './knowledge_base.js';
 
-// 申请 Vercel 最大执行时间
-export const config = {
+// 申请 Vercel 最大执行时间 
     maxDuration: 60, 
 };
 
@@ -25,30 +24,32 @@ export default async function handler(req, res) {
         const scenarioName = scenarioKey === 'academic' ? '学术论文/答辩' : (scenarioKey === 'business' ? '商业计划书/创赛' : '通用逻辑陈述');
         const rules = KNOWLEDGE_BASE[scenarioKey];
 
-        // 3. 构建高强度的逻辑审计 Prompt
+        // 3. 构建高强度的逻辑审计 Prompt (集大成者)
         const systemPrompt = `你是一个名为 "Logic Auditor" 的严苛逻辑审计与重构系统。
+你的身份是【红队测试专家】与【顶级期刊编辑】的结合体。
 你的目标不仅仅是润色，而是**摧毁**这段文本中模糊、空洞、逻辑断裂的部分，并基于权威标准进行重建。
 
 ### 当前审计上下文：
 - 场景模式：【${scenarioName}】
-- 进度状态：正在处理长文档的第 ${chunkIndex + 1} / ${totalChunks} 部分（请注意：这是一段中间文本，不要苛求缺乏开头或结尾）。
-- **必须依据的核心校验标准**：
+- 进度状态：正在处理长文档的第 ${chunkIndex + 1} / ${totalChunks} 部分（请注意上下文衔接）。
+- **必须严格依据的权威标准**：
 ${rules}
 
 ### 你的执行流程 (Think Step-by-Step)：
 
 1. **逻辑漏洞狙击 (Vulnerability Sniping)**：
-   - 像一个挑剔的投资人或盲审专家一样审视这段文字。
-   - 寻找具体的逻辑硬伤：循环论证、数据缺失、因果倒置、以偏概全、定义模糊。
-   - **注意：如果这段文字质量尚可，不要强行制造问题，只针对严重漏洞报错。**
+   - 请找出本片段中 **2-5个** 最严重的逻辑谬误。
+   - 关注点：循环论证、滑坡谬误、以偏概全、数据缺失、因果倒置、定义模糊。
+   - **必须提取原文**：critiques中的 "quote" 字段必须精确复制原文中的问题句子。
 
 2. **强制规则引用 (Rule Grounding)**：
    - 当你指控一个漏洞时，**必须**引用上述【核心校验标准】中的具体条款（包含标准名和序号）。
-   - 例如："违背 [标准名] 第2条：严禁使用绝对化词汇"。
+   - 格式示例："违背 [GB/T 7713] 第2条：严禁使用绝对化词汇"。
 
 3. **防御性深度重构 (Deep Refactoring)**：
-   - 重写这段话。要求逻辑闭环，去伪存真。
-   - **数据补全**：遇到内容空洞处，使用 [建议补充2024年行业渗透率数据] 格式的占位符。
+   - **不要只做修补，要重写整段话**，使其达到金奖项目/顶刊发表水准。
+   - **逻辑闭环**：确保每一句推论都有前置条件支撑。
+   - **数据占位符**：遇到内容空洞处，必须插入专业占位符，例如：[此处需补充2024年Q3市场渗透率数据] 或 [需补充权威文献引用]。
    - **高亮关键修改**：对你增强逻辑力度的关键修改处，必须使用 HTML <b> 标签包裹。
 
 ### 输出格式要求：
@@ -63,7 +64,7 @@ ${rules}
             "fix": "具体的修改或补救建议"
         }
     ],
-    "revised_text": "重写后的完整片段，保留段落结构，关键修改处用 <b> 包裹"
+    "revised_text": "重写后的完整片段，保留段落结构，关键修改处用 <b> 包裹，缺失数据处保留 [] 占位符"
 }`;
 
         // 4. 调用 API
@@ -83,9 +84,9 @@ ${rules}
                 },
                 parameters: { 
                     result_format: 'message',
-                    temperature: 0.1, // 低温以保证严谨
+                    temperature: 0.15, // 稍微给一点点温度让重构更流畅，但依然保持严谨
                     top_p: 0.8,
-                    max_tokens: 1000 // 限制 token 防止过度生成导致截断严重
+                    max_tokens: 1500 // 适当增加 token 限制，防止重构文写不完
                 },
             }),
         });
@@ -99,7 +100,7 @@ ${rules}
 
         const rawContent = data.output.choices[0].message.content;
         
-        // 5. 使用安全解析函数（脏数据修复）
+        // 5. 使用安全解析函数 (脏数据修复，防止截断报错)
         const result = safeJsonParse(rawContent, text); 
 
         return res.status(200).json(result);
@@ -116,7 +117,7 @@ ${rules}
 }
 
 /**
- *  脏 JSON 修复与安全解析工具
+ * 脏 JSON 修复与安全解析工具
  * 专门处理大模型输出被截断（Unterminated string）的情况
  */
 function safeJsonParse(jsonString, originalText) {
